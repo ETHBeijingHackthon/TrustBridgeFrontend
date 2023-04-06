@@ -1,4 +1,6 @@
 <script setup>
+import { getAvatar } from '@/utils/common'
+
 defineProps({
   data: {
     type: Object,
@@ -17,7 +19,7 @@ defineProps({
     <div class="flex justify-between mb-2">
       <div class="flex items-center">
         <a-avatar :size="24">
-          <img :src="`https://robohash.org/${data.postby}.png?set=set3&size=1200x1200`" alt="avatar">
+          <img :src="getAvatar(data.postby)" alt="avatar">
         </a-avatar>
         <span class="ml-3">{{ data.postby }}</span>
       </div>

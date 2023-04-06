@@ -1,6 +1,9 @@
 <script setup>
+import { useRouter } from 'vue-router'
 import { Category } from '@/components'
+import { getAvatar } from '@/utils/common'
 
+const USE_ROUTER = useRouter()
 defineProps({
   data: {
     type: Object,
@@ -14,10 +17,14 @@ defineProps({
     })
   }
 })
+
+const toDetail = () => {
+  USE_ROUTER.push('/detail')
+}
 </script>
 
 <template>
-  <div class="show-card rounded cursor-pointer">
+  <div class="show-card rounded cursor-pointer" @click="toDetail">
     <img style="width: 100%; height: 230px" class="mb-3 object-cover object-center rounded overflow-hidden"
       :src="data.imgUrl" alt="cover">
     <div class="px-5 pt-2 pb-4">
@@ -26,7 +33,7 @@ defineProps({
       <div class="mb-2">
         <a-avatar-group :size="24" :max-count="3">
           <a-avatar v-for="(item, index) in data.rates" :key="index">
-            <img :src="`https://robohash.org/${item}.png?set=set3&size=1200x1200`" />
+            <img :src="getAvatar(item)" />
           </a-avatar>
         </a-avatar-group>
       </div>

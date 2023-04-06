@@ -1,8 +1,7 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import Logo from '@/assets/images/logo.svg'
-import Wallet from '@/assets/images/icon/wallet.svg'
-import { Post } from '@/components'
+import { Post, ConnectWallet } from '@/components'
 
 const USE_ROUTER = useRouter()
 
@@ -27,12 +26,7 @@ const toHome = () => {
         Post
       </a-button>
     </Post>
-    <a-button size="large" @click="handleConnectWallet">
-      <template #icon>
-        <img :src="Wallet" alt="icon">
-      </template>
-      Connect Wallet
-    </a-button>
+    <ConnectWallet />
   </div>
 </template>
 
