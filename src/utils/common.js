@@ -13,6 +13,18 @@ export const notiError = (content, errData) => {
   return notification
 }
 
+export const handleThegraphError = (err) => {
+  const { errors } = err
+  let _err = ''
+  for (let i = 0; i < errors.length; ++i) {
+    const current = errors[i]
+    _err += current.message + `${i == errors.length - 1 ? '' : '; '}`
+  }
+
+  notiError(_err)
+  console.error(err)
+}
+
 export const formatAddress = (address) => {
   if (address) {
     return address.slice(0, 4) + '****' + address.slice(-4)

@@ -1,11 +1,10 @@
 <script setup>
 import { reactive } from 'vue'
-import { useAccount, useConnect, useDisconnect } from 'vagmi'
-import { InjectedConnector } from 'vagmi/connectors/injected'
+import { useAccount, useConnect, useDisconnect, useNetwork, useSwitchNetwork } from 'vagmi'
 import Wallet from '@/assets/images/icon/wallet.svg'
 import Metamask from '@/assets/images/icon/metamask.svg'
 import WalletConnect from '@/assets/images/icon/wallet-connect.svg'
-import { formatAddress, getAvatar } from '@/utils/common'
+import { formatAddress, getAvatar, notiError } from '@/utils/common'
 
 const mapConnector = {
   metaMask: Metamask,
@@ -13,23 +12,32 @@ const mapConnector = {
 }
 
 const ConnectWallet = reactive({
-  visible: false
+  visible: false,
+  disConcVisible: false
 })
 
+const { chain } = useNetwork();
+const { switchNetwork }
+  = useSwitchNetwork({
+    onError(error) {
+      notiError(error)
+      console.log('Error', error);
+    }
+  });
 const { disconnect } = useDisconnect()
-
 const { isConnected, address } = useAccount()
-
-const { connect, connectors, pendingConnector, isLoading } = useConnect({
-  connector: new InjectedConnector(),
+const { connect, connectors, pendingConnector } = useConnect({
+  onConnect: () => {
+    ConnectWallet.visible = false
+    // switch network
+    if (chain.value !== import.meta.env.VITE_CHAIN_ID_DECIMAL) {
+      switchNetwork.value(import.meta.env.VITE_CHAIN_ID)
+    }
+  }
 })
-
-const handleConnect = async (connector) => {
-  await connect.value(connector)
-  ConnectWallet.visible = false
-}
 
 const handleDisconnect = () => {
+  ConnectWallet.disConcVisible = false
   disconnect()
 }
 </script>
@@ -41,8 +49,9 @@ const handleDisconnect = () => {
     </template>
     {{ address ? formatAddress(address) : 'Connect Wallet' }}
   </a-button>
-  <a-popover position="br">
-    <a-button size="large" v-if="address">{{ formatAddress(address) }}</a-button>
+  <a-popover position="br" trigger="click" :popup-visible="ConnectWallet.disConcVisible">
+    <a-button size="large" v-if="address" @click="ConnectWallet.disConcVisible = true">{{ formatAddress(address)
+    }}</a-button>
     <template #content>
       <div class="flex items-center mb-4">
         <a-avatar>
@@ -55,7 +64,7 @@ const handleDisconnect = () => {
   </a-popover>
   <a-modal :width="360" v-model:visible="ConnectWallet.visible" title="Connect Wallet" simple :footer="false">
     <ul>
-      <li class="connector" v-for="connector in connectors" :key="connector.id" @click="handleConnect(connector)">
+      <li class="connector" v-for="connector in connectors" :key="connector.id" @click="connect(connector)">
         <span>{{ connector.name }}{{ !connector.ready ? ' (unsupported)' : '' }} {{
           connector.id ===
           pendingConnector?.id && !isConnected

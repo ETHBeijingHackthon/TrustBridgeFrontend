@@ -1,7 +1,12 @@
 <script setup>
-import { reactive } from 'vue'
+import { reactive, toRaw, watch } from 'vue'
+import { useSigner, useAccount } from 'vagmi'
 import Category from '@/contants/category'
 import { ShowCard, Post } from '@/components'
+import { geneTrustBridgeContract } from '@/contracts'
+
+const { data } = useSigner()
+const { isConnected } = useAccount()
 
 const Home = reactive({
   list: [
