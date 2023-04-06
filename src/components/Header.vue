@@ -1,0 +1,39 @@
+<script setup>
+import { useRouter } from 'vue-router'
+import Logo from '@/assets/images/logo.svg'
+import Wallet from '@/assets/images/icon/wallet.svg'
+import { Post } from '@/components'
+
+const USE_ROUTER = useRouter()
+
+const toHome = () => {
+  USE_ROUTER.push('/')
+}
+</script>
+
+<template>
+  <div class="flex px-10 py-5 items-center border-b-[1px] border-b-[#4A4A4B]">
+    <div class="flex text-lg font-bold items-center cursor-pointer" @click="toHome">
+      <div class="bg-primary p-2 rounded">
+        <img :src="Logo" class="margin-0" alt="Logo" />
+      </div>
+      <span class="ml-5">TrustBridge</span>
+    </div>
+    <Post class="ml-auto mr-4">
+      <a-button size="large">
+        <template #icon>
+          <icon-send :size="20" />
+        </template>
+        Post
+      </a-button>
+    </Post>
+    <a-button size="large" @click="handleConnectWallet">
+      <template #icon>
+        <img :src="Wallet" alt="icon">
+      </template>
+      Connect Wallet
+    </a-button>
+  </div>
+</template>
+
+<style scoped></style>

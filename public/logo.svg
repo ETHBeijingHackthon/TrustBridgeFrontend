@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24" height="24" style="border-color: rgba(0,0,0,0);border-width: bpx;border-style: undefined" filter="none">
+    
+    <g>
+    <path d="M8 13C8 13 14 23 24 23C34 23 40 13 40 13" stroke="rgba(255,255,255,1)" stroke-width="4" fill="none"></path><path d="M8 10V38" stroke="rgba(255,255,255,1)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"></path><path d="M40 10V38" stroke="rgba(255,255,255,1)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"></path><path d="M4 30.5C4 30.5 16.1877 29.9026 24 30C31.8196 30.0975 44 31 44 31" stroke="rgba(255,255,255,1)" stroke-width="4" stroke-linecap="round" fill="none"></path><path d="M16 21V30" stroke="rgba(255,255,255,1)" stroke-width="4" stroke-linecap="round" fill="none"></path><path d="M24 23L24 30" stroke="rgba(255,255,255,1)" stroke-width="4" stroke-linecap="round" fill="none"></path><path d="M32 21L32 30" stroke="rgba(255,255,255,1)" stroke-width="4" stroke-linecap="round" fill="none"></path><path d="M8 13L4 18" stroke="rgba(255,255,255,1)" stroke-width="4" stroke-linecap="round" fill="none"></path><path d="M44 18L40 13" stroke="rgba(255,255,255,1)" stroke-width="4" stroke-linecap="round" fill="none"></path>
+    </g>
+  </svg>
