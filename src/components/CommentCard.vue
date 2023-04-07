@@ -24,11 +24,11 @@ defineProps({
         </a-avatar>
         <span class="ml-3">{{ formatAddress(data.reviewer) }}</span>
       </div>
-      <a-rate :model-value="data.score / 2" disabled allow-half readonly />
+      <a-rate v-if="+data.score" :model-value="data.score / 2" disabled allow-half readonly />
     </div>
     <div class="mb-2">{{ data.description }}</div>
     <div v-if="getCoverUri(data.multimedia)">
-      <img :src="getCoverUri(data.multimedia)" alt="media">
+      <a-image width="200" height="200" fit="cover" :src="getCoverUri(data.multimedia)" />
     </div>
   </div>
 </template>
