@@ -7,12 +7,12 @@ import { ShowCard, Post } from '@/components'
 import { getNftcreatedEntities, getNftcollectedEntities } from '@/apis'
 
 const pageSize = 10
-const { address } = useAccount()
+const { address, isConnected } = useAccount()
 const USE_ROUTER = useRouter()
 const Home = reactive({
   loading: false,
   skip: 0,
-  category: '1',
+  category: 'collected',
   list: [],
   getCreatedNft() {
     Home.list = []
@@ -79,7 +79,9 @@ const Home = reactive({
 })
 
 onMounted(() => {
-  Home.getData()
+  setInterval(() => {
+    Home.getData()
+  }, 5000)
 })
 </script>
 
@@ -96,13 +98,13 @@ onMounted(() => {
         <a-tab-pane v-for="item in Category" :key="item.key" :title="item.label">
         </a-tab-pane>
         <template #extra>
-          <a-button class="ml-auto mr-4" size="large" @click="Home.getPosted">
+          <a-button :disabled="!isConnected" class="ml-auto mr-4" size="large" @click="Home.getPosted">
             <template #icon>
               <icon-send :size="20" />
             </template>
             Posted
           </a-button>
-          <a-button size="large" @click="Home.getCollected">
+          <a-button :disabled="!isConnected" size="large" @click="Home.getCollected">
             <template #icon>
               <icon-star />
             </template>

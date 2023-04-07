@@ -67,7 +67,7 @@ const Detail = reactive({
         await tx.wait()
         formRef.value.resetFields()
         mediaRef.value.clearFiles()
-        Message.success('Successfully posted！')
+        Message.success('Successfully posted!')
         Detail.handleRefreshComment()
       })
       .catch(err => {
@@ -97,6 +97,7 @@ const Detail = reactive({
       .then(async tx => {
         await tx.wait()
         wait.close()
+        Message.success('Successfully collected!')
       })
       .catch(err => {
         console.log(err);
@@ -164,11 +165,14 @@ onMounted(() => {
         </a-form>
       </div>
       <div class="detail__right__title">List</div>
-      <ul>
+      <ul v-if="Detail.comments.length">
         <li class="mb-4" v-for="(comment, index) in Detail.comments" :key="index">
           <CommentCard :data="comment" />
         </li>
       </ul>
+      <div class="detail__right__wrap" v-else>
+        <a-empty />
+      </div>
     </div>
   </div>
 </template>
