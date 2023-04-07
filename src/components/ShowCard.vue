@@ -1,16 +1,17 @@
 <script setup>
-import { Category } from '@/components'
-import { getAvatar, getCoverUri } from '@/utils/common'
+import { Category, Cover } from '@/components'
+import { getAvatar } from '@/utils/common'
 
 defineProps({
   data: {
     type: Object,
     default: () => ({
+      id: '',
       coverUri: '',
       title: '',
       sort: 0,
       title: '',
-      rates: [],
+      reviewCount: 0,
       score: 0
     })
   }
@@ -20,22 +21,22 @@ defineProps({
 <template>
   <div class="show-card rounded cursor-pointer">
     <div class="mb-3 rounded overflow-hidden" style="background: rgba(0, 0, 0, .1)">
-      <img style="width: 100%; height: 230px" class="object-cover object-center" :src="getCoverUri(data.coverUri)"
-        alt="cover">
+      <Cover class="h-[230px]" :coverUri="data.coverUri" :sort="data.sort" />
     </div>
     <div class="px-5 pt-2 pb-4">
       <Category class="mb-1" :category="data.sort" />
       <div class="mb-2 break-words">{{ data.title }}</div>
       <div class="mb-2">
         <a-avatar-group :size="24" :max-count="3">
-          <a-avatar v-for="(item, index) in data.rates" :key="index">
-            <img :src="getAvatar(item)" />
+          <a-avatar v-for="(item, index) in +data.reviewCount < 3 ? +data.reviewCount : 3 " :key="index">
+            <img :src="getAvatar(data.id + index)" />
           </a-avatar>
         </a-avatar-group>
+        <span class="ml-1">{{ data.reviewCount }} commented</span>
       </div>
       <div class="flex justify-between items-center">
-        <a-rate :default-value="+data.score" readonly disabled />
-        <span>{{ +data.score && (+data.score).toFixed(1) }}</span>
+        <a-rate :default-value="+data.score / 2" readonly disabled allow-half />
+        <span>{{ +data.score && (+data.score / 2).toFixed(1) }}</span>
       </div>
     </div>
   </div>

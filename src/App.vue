@@ -1,11 +1,12 @@
 <script setup>
+import enUS from '@arco-design/web-vue/es/locale/lang/en-us';
 document.body.setAttribute('arco-theme', 'dark')
 </script>
 
 <template>
-  <div>
+  <a-config-provider :locale="enUS">
     <router-view></router-view>
-  </div>
+  </a-config-provider>
 </template>
 
 <style lang="less" scoped>

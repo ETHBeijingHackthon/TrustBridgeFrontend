@@ -5,5 +5,15 @@ import Category from './Category.vue'
 import CommentCard from './CommentCard.vue'
 import Post from './Post.vue'
 import ConnectWallet from './ConnectWallet.vue'
+import Cover from './Cover.vue'
 
-export { Upload, Header, ShowCard, Category, CommentCard, Post, ConnectWallet }
+export {
+  Upload,
+  Header,
+  ShowCard,
+  Category,
+  CommentCard,
+  Post,
+  ConnectWallet,
+  Cover,
+}

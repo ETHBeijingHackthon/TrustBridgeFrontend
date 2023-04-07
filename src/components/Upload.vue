@@ -13,14 +13,16 @@ const onChange = (_, currentFile) => {
   };
 };
 const onProgress = (currentFile) => {
-  file.value = currentFile;
+  // file.value = currentFile;
 };
 
 const onSuccess = (e) => {
+  console.log(e);
   emits('onSuccess', e.response);
 }
 
 const onError = () => {
+  file.value = null
   notiError('An error occurred uploading photos.')
 }
 
@@ -53,6 +55,12 @@ defineExpose({
             top: '50%',
             transform: 'translateX(-50%) translateY(-50%)',
           }" />
+          <!-- <a-progress v-if="file.status === 'done'" type="circle" size="mini" status='success' :style="{
+              position: 'absolute',
+              left: '50%',
+              top: '50%',
+              transform: 'translateX(-50%) translateY(-50%)',
+            }" /> -->
         </div>
         <div class="arco-upload-picture-card" style="background-color: #9D9B9B;" v-else>
           <div class="arco-upload-picture-card-text">

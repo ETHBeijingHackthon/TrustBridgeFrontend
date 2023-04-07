@@ -1,14 +1,22 @@
 <script setup>
-import { reactive, onMounted } from 'vue'
+import { ref, toRaw, reactive, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { Category, Upload, CommentCard } from '@/components'
-import { getAvatar, getCoverUri, formatAddress } from '@/utils/common'
-import { getNftcreatedEntities } from '@/apis'
+import { useSigner } from 'vagmi'
+import { Message } from '@arco-design/web-vue'
+import { geneTrustBridgeContract } from '@/contracts'
+import Medias from '@/contants/media'
+import { Category, Upload, CommentCard, Cover } from '@/components'
+import { getAvatar, getCoverUri, formatAddress, notiWaiting, notiError } from '@/utils/common'
+import { queryTrustBridge, getNftreviewedEntities } from '@/apis'
 
+const formRef = ref(null)
+const mediaRef = ref(null)
 const { query: { id } } = useRoute()
+const { data } = useSigner()
 
-console.log(id)
 const Detail = reactive({
+  disabledForm: false,
+  disabledCollect: false,
   data: {
     coverUri: '',
     sort: 1,
@@ -19,43 +27,88 @@ const Detail = reactive({
     reviewCount: 0,
     description: ''
   },
-  coverUri: '',
-  sort: 1,
-  title: '',
-  owner: '',
-  score: 0,
-  collectCount: 2,
-  reviewCount: 0,
-  // rates: ['a', 'b'],
-  description: '',
   form: {
     point: 0,
     comments: '',
-    media: '',
-    cid: '',
+    mediaType: '1',
+    multiMedia: '',
   },
   comments: [
     {
-      postby: '0x333....423d',
+      postby: '',
       point: 0,
-      comment: 'desc',
+      comment: '',
       media: '1'
     }
   ],
-  getDetail() {
-    getNftcreatedEntities(`where: {id: "${id}"}, first: 1`)
+  getDetailAndComments() {
+    queryTrustBridge(`{
+      nftreviewedEntities(first: 10, where: {nftId: "${parseInt(id.slice(2), 16)}"}) {id mediaType multimedia nftId reviewer score description },
+      nftcreatedEntities(first: 1, where: {id: "${id}"}) { id owner nftId fid mediaType multimedia reviewCount
+      score sort title collectCount coverUri description }
+      }`)
       .then(res => {
         const data = res.nftcreatedEntities[0]
         if (data) {
           Detail.data = data
           Detail.data.coverUri = getCoverUri(data.coverUri)
         }
+
+        Detail.comments = res.nftreviewedEntities
+      })
+  },
+  handleSubmit({ values, errors }) {
+    if (errors) return
+    Detail.disabledForm = true
+    const wait = notiWaiting()
+    const trustBridgeContract = geneTrustBridgeContract(toRaw(data.value))
+    trustBridgeContract.reviewNFT(id, values.point * 2, values.comments, values.mediaType, values.multiMedia)
+      .then(async tx => {
+        await tx.wait()
+        formRef.value.resetFields()
+        mediaRef.value.clearFiles()
+        Message.success('Successfully posted！')
+        Detail.handleRefreshComment()
+      })
+      .catch(err => {
+        console.log(err);
+        wait.close()
+        notiError(err.reason || err.message);
+      })
+      .finally(() => {
+        Detail.disabledForm = false
+        wait.close()
+      })
+  },
+  handleCoverUpload(res) {
+    Detail.form.multiMedia = res.cid
+  },
+  handleRefreshComment() {
+    getNftreviewedEntities(`first: 10, where: {nftId: "${parseInt(id.slice(2), 16)}"}`)
+      .then(res => {
+        console.log(res);
+      })
+  },
+  handleCollect() {
+    Detail.disabledCollect = true
+    const wait = notiWaiting()
+    const trustBridgeContract = geneTrustBridgeContract(toRaw(data.value))
+    trustBridgeContract.collectNFT(parseInt(id.slice(2), 16))
+      .then(async tx => {
+        await tx.wait()
+        wait.close()
+      })
+      .catch(err => {
+        console.log(err);
+        wait.close()
+        notiError(err.reason || err.message);
+        Detail.disabledCollect = false
       })
   }
 })
 
 onMounted(() => {
-  Detail.getDetail()
+  Detail.getDetailAndComments()
 })
 </script>
 
@@ -63,23 +116,22 @@ onMounted(() => {
   <div class="detail flex justify-center pt-16">
     <div class="detail__left w-[380px] mr-20 text-center">
       <div class="detail__left__image mb-7 rounded">
-        <img :src="Detail.data.coverUri" style="width: 368px; height: 368px"
-          class="rounded overflow-hidden object-cover object-center" alt="item cover">
+        <Cover class="h-[368px]" :coverUri="Detail.data.coverUri" :sort="Detail.data.sort" />
       </div>
       <Category :category="Detail.data.sort" class="justify-center mb-2" :showLable="true" />
       <div class="mb-4 text-4xl break-words">{{ Detail.data.title }}</div>
       <div class="mb-6 text-[#B9B9B9]">Posted by {{ formatAddress(Detail.data.owner) }}</div>
-      <div class="mb-2 text-3xl">{{ +Detail.data.score && (+Detail.data.score).toFixed(1) }}</div>
-      <a-rate :model-value="Detail.data.score" disabled />
+      <div class="mb-2 text-3xl">{{ +Detail.data.score && (+Detail.data.score / 2).toFixed(1) }}</div>
+      <a-rate :model-value="Detail.data.score / 2" disabled allow-half />
       <div class="mt-4 mb-6 text-[#B9B9B9]">
-        <!-- <a-avatar-group :size="24" :max-count="3">
-                          <a-avatar v-for="(item, index) in Detail.rates" :key="index">
-                            <img :src="getAvatar(item)" />
-                          </a-avatar>
-                        </a-avatar-group> -->
-        <span>{{ Detail.data.reviewCount }}</span>
+        <a-avatar-group :size="24" :max-count="3">
+          <a-avatar v-for="(item, index) in (Detail.data.reviewCount < 3 ? Detail.data.reviewCount : 3)" :key="index">
+            <img :src="getAvatar(id + index)" />
+          </a-avatar>
+        </a-avatar-group>
+        <span class="ml-1">{{ Detail.data.reviewCount }} commented</span>
       </div>
-      <a-button class="ml-auto mr-4" size="large">
+      <a-button :disabled="Detail.disabledCollect" @click="Detail.handleCollect" class="ml-auto mr-4" size="large">
         <template #icon>
           <icon-star :size="20" />
         </template>
@@ -91,25 +143,23 @@ onMounted(() => {
       <div class="detail__right__wrap mb-10">{{ Detail.data.description }}</div>
       <div class="detail__right__title">Comment</div>
       <div class="detail__right__wrap mb-10">
-        <a-form>
-          <a-form-item field="point" label="Point" :rules="[{ required: true, message: 'point is required' }]">
-            <a-rate :default-value="Detail.form.point" />
+        <a-form ref="formRef" :model="Detail.form" :disabled="Detail.disabledForm" @submit="Detail.handleSubmit">
+          <a-form-item field="point" label="Point" :rules="[{ type: 'number', min: 0.5 }]" required>
+            <a-rate v-model="Detail.form.point" :count="5" allow-half />
           </a-form-item>
           <a-form-item field="comments" label="Comments">
             <a-textarea v-model="Detail.form.comments" placeholder="Please enter your comments" allow-clear />
           </a-form-item>
-          <a-form-item field="media" label="Media">
-            <a-radio-group v-model="Detail.form.media">
-              <a-radio value="1">img</a-radio>
-              <a-radio value="2">video</a-radio>
-              <a-radio value="3">audio</a-radio>
+          <a-form-item field="mediaType" label="Media">
+            <a-radio-group v-model="Detail.form.mediaType">
+              <a-radio :value="media.key" v-for="media in   Medias" :key="media.key">{{ media.label }}</a-radio>
             </a-radio-group>
           </a-form-item>
-          <a-form-item>
-            <Upload />
+          <a-form-item field="multiMedia">
+            <Upload ref="mediaRef" @onSuccess="Detail.handleCoverUpload" />
           </a-form-item>
           <a-form-item>
-            <a-button type="primary" long>Submit</a-button>
+            <a-button type="primary" size="large" html-type="submit" long>Submit</a-button>
           </a-form-item>
         </a-form>
       </div>

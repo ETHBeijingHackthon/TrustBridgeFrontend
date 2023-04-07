@@ -1,14 +1,15 @@
 <script setup>
-import { getAvatar } from '@/utils/common'
+import { getAvatar, formatAddress, getCoverUri } from '@/utils/common'
 
 defineProps({
   data: {
     type: Object,
     default: () => ({
-      postby: '',
-      point: 0,
-      comment: '',
-      media: ''
+      reviewer: '',
+      score: 0,
+      description: '',
+      mediaType: '',
+      multimedia: ''
     })
   }
 })
@@ -19,15 +20,15 @@ defineProps({
     <div class="flex justify-between mb-2">
       <div class="flex items-center">
         <a-avatar :size="24">
-          <img :src="getAvatar(data.postby)" alt="avatar">
+          <img :src="getAvatar(data.reviewer)" alt="avatar">
         </a-avatar>
-        <span class="ml-3">{{ data.postby }}</span>
+        <span class="ml-3">{{ formatAddress(data.reviewer) }}</span>
       </div>
-      <a-rate :default-value="data.point" readonly disabled />
+      <a-rate :default-value="data.score / 2" readonly disabled allow-half />
     </div>
-    <div class="mb-2">{{ data.comment }}</div>
+    <div class="mb-2">{{ data.description }}</div>
     <div>
-      media
+      <img :src="getCoverUri(data.multimedia)" alt="media">
     </div>
   </div>
 </template>

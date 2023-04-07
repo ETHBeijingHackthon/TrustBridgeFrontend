@@ -50,7 +50,8 @@ const handleDisconnect = () => {
     {{ address ? formatAddress(address) : 'Connect Wallet' }}
   </a-button>
   <a-popover position="br" trigger="click" :popup-visible="ConnectWallet.disConcVisible">
-    <a-button size="large" v-if="address" @click="ConnectWallet.disConcVisible = true">{{ formatAddress(address)
+    <a-button size="large" v-if="address" @click="ConnectWallet.disConcVisible = !ConnectWallet.disConcVisible">{{
+      formatAddress(address)
     }}</a-button>
     <template #content>
       <div class="flex items-center mb-4">

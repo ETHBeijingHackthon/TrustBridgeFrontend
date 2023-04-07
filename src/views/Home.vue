@@ -1,17 +1,33 @@
 <script setup>
 import { reactive, onMounted } from 'vue'
+import { useAccount } from 'vagmi'
 import { useRouter } from 'vue-router'
 import Category from '@/contants/category'
 import { ShowCard, Post } from '@/components'
-import { getNftcreatedEntities } from '@/apis'
+import { getNftcreatedEntities, getNftcollectedEntities } from '@/apis'
 
+const pageSize = 10
+const { address } = useAccount()
 const USE_ROUTER = useRouter()
 const Home = reactive({
   loading: false,
+  skip: 0,
+  category: 'collected',
   list: [],
-  getCreatedNft(query) {
+  getCreatedNft() {
     Home.list = []
     Home.loading = true
+    let query = ''
+
+    switch (Home.category) {
+      case '1': case '2': case '3': case '4': case '5': case '6':
+        query = `where: {fid: 0${Home.category == '1' ? '' : `, sort: "${Home.category}"`}}, first: ${pageSize}, skip: ${Home.skip}`
+        break
+      case 'posted':
+        query = `where: {fid: 0, owner: "${address.value}"}, first: ${pageSize}, skip: ${Home.skip}`
+        break
+    }
+
     getNftcreatedEntities(query)
       .then(res => {
         Home.list = res.nftcreatedEntities
@@ -20,19 +36,50 @@ const Home = reactive({
         Home.loading = false
       })
   },
+  getPosted() {
+    Home.category = 'posted'
+    Home.skip = 0
+    Home.getCreatedNft()
+  },
+  getCollected() {
+    Home.category = 'collected'
+    Home.skip = 0
+    getNftcollectedEntities(`first: 10, skip: 0, where: {collector: "${address.value}"}`)
+      .then(res => {
+        console.log(res);
+      })
+  },
+  getData() {
+    if (Home.category != 'collected') {
+      Home.getCreatedNft()
+    } else {
+      Home.getCollected()
+    }
+  },
   handleTabChange(key) {
-    Home.getCreatedNft(`where: {fid: 0${key == '1' ? '' : `, sort: "${key}"`}}, first: 10`)
+    Home.category = key
+    Home.skip = 0
+    Home.getCreatedNft()
   },
   handleToDetail(id) {
     USE_ROUTER.push({
       path: '/detail',
       query: { id }
     })
-  }
+  },
+  handlePrev() {
+    if (Home.skip == 0) return
+    Home.skip -= pageSize
+    Home.getCreatedNft()
+  },
+  handleNext() {
+    Home.skip += pageSize
+    Home.getCreatedNft()
+  },
 })
 
 onMounted(() => {
-  Home.getCreatedNft(`where: {fid: 0}, first: 10`)
+  Home.getData()
 })
 </script>
 
@@ -45,17 +92,17 @@ onMounted(() => {
       </Post>
     </div>
     <div class="home__bottom">
-      <a-tabs default-active-key="1" size="large" @change="Home.handleTabChange">
+      <a-tabs :active-key="Home.category" size="large" @change="Home.handleTabChange">
         <a-tab-pane v-for="item in Category" :key="item.key" :title="item.label">
         </a-tab-pane>
         <template #extra>
-          <a-button class="ml-auto mr-4" size="large" @click="onSend">
+          <a-button class="ml-auto mr-4" size="large" @click="Home.getPosted">
             <template #icon>
               <icon-send :size="20" />
             </template>
             Posted
           </a-button>
-          <a-button size="large" @click="onCollected">
+          <a-button size="large" @click="Home.getCollected">
             <template #icon>
               <icon-star />
             </template>
@@ -70,16 +117,18 @@ onMounted(() => {
           </li>
         </ul>
       </a-spin>
-      <a-button-group>
-        <a-button type="primary">
-          <icon-left />
-          Prev
-        </a-button>
-        <a-button type="primary">
-          Next
-          <icon-right />
-        </a-button>
-      </a-button-group>
+      <div class="text-center">
+        <a-button-group>
+          <a-button :disabled="!Home.skip" type="primary" @click="Home.handlePrev">
+            <icon-left />
+            Prev
+          </a-button>
+          <a-button :disabled="Home.list.length < pageSize" type="primary" @click="Home.handleNext">
+            Next
+            <icon-right />
+          </a-button>
+        </a-button-group>
+      </div>
     </div>
   </div>
 </template>
