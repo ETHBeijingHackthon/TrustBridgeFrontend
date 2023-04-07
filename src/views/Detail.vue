@@ -53,7 +53,6 @@ const Detail = reactive({
         const data = res.nftcreatedEntities[0]
         if (data) {
           Detail.data = data
-          Detail.data.coverUri = getCoverUri(data.coverUri)
         }
 
         Detail.comments = res.nftreviewedEntities

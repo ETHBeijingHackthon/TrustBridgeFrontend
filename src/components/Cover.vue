@@ -19,8 +19,7 @@ const currentCate = computed(() => Category.filter(item => +item.key === +props.
 
 <template>
   <div class="cover">
-    <img v-if="getCoverUri(coverUri)" style="width: 100%; height: 230px" class="object-cover object-center"
-      :src="getCoverUri(coverUri)" alt="cover">
+    <a-image v-if="getCoverUri(coverUri)" fit="cover" class="object-center" :src="getCoverUri(coverUri)" />
     <div class="cover__default rounded" v-else>
       <div class="w-[70px] h-[70px] bg-no-repeat bg-center" :class="[currentCate?.className]"></div>
     </div>

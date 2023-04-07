@@ -3,6 +3,13 @@ import { ref } from 'vue'
 import { IconEdit, IconPlus } from '@arco-design/web-vue/es/icon';
 import { notiError } from '@/utils/common'
 
+const props = defineProps({
+  ifCover: {
+    type: Boolean,
+    default: false
+  }
+})
+
 const emits = defineEmits(['onSuccess'])
 const file = ref();
 const web3StorageKey = import.meta.env.VITE_WEB3STORAGE_KEY
@@ -37,11 +44,11 @@ defineExpose({
 </script>
 
 <template>
-  <a-upload action="https://api.web3.storage/upload" :fileList="file ? [file] : []" :show-file-list="false"
+  <a-upload action="https://api.web3.storage/upload" :fileList="file ? [file] : []" :show-file-list="true"
     :headers="{ Authorization: `Bearer ${web3StorageKey}` }" @change="onChange" @progress="onProgress"
     @success="onSuccess" @error="onError">
     <template #upload-button>
-      <div :class="`arco-upload-list-item${file && file.status === 'error' ? ' arco-upload-list-item-error' : ''
+      <div v-if="ifCover" :class="`arco-upload-list-item${file && file.status === 'error' ? ' arco-upload-list-item-error' : ''
         }`">
         <div class="arco-upload-list-picture custom-upload-avatar" v-if="file && file.url">
           <img :src="file.url" />
@@ -56,11 +63,11 @@ defineExpose({
             transform: 'translateX(-50%) translateY(-50%)',
           }" />
           <!-- <a-progress v-if="file.status === 'done'" type="circle" size="mini" status='success' :style="{
-              position: 'absolute',
-              left: '50%',
-              top: '50%',
-              transform: 'translateX(-50%) translateY(-50%)',
-            }" /> -->
+                    position: 'absolute',
+                    left: '50%',
+                    top: '50%',
+                    transform: 'translateX(-50%) translateY(-50%)',
+                  }" /> -->
         </div>
         <div class="arco-upload-picture-card" style="background-color: #9D9B9B;" v-else>
           <div class="arco-upload-picture-card-text">
@@ -68,6 +75,7 @@ defineExpose({
           </div>
         </div>
       </div>
+      <a-button v-else type="primary">Upload</a-button>
     </template>
   </a-upload>
 </template>

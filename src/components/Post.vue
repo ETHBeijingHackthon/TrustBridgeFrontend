@@ -77,7 +77,7 @@ const Post = reactive({
         <a-form-item field="cover" label="Cover">
           <Upload ref="coverRef" @onSuccess="Post.handleCoverUpload" />
         </a-form-item>
-        <a-form-item field="mediaType" label="Media">
+        <a-form-item field="mediaCate" label="Media">
           <a-radio-group v-model="Post.form.mediaCate">
             <a-radio :value="media.key" v-for="media in Medias" :key="media.key">{{ media.label }}</a-radio>
           </a-radio-group>
