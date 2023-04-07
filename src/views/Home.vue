@@ -15,7 +15,7 @@ const Home = reactive({
   category: 'collected',
   list: [],
   getCreatedNft() {
-    Home.list = []
+    // Home.list = []
     Home.loading = true
     let query = ''
 
@@ -46,7 +46,7 @@ const Home = reactive({
     Home.skip = 0
     getNftcollectedEntities(`first: 10, skip: 0, where: {collector: "${address.value}"}`)
       .then(res => {
-        console.log(res);
+        console.log(res.nftcollectedEntities);
       })
   },
   getData() {
@@ -79,9 +79,10 @@ const Home = reactive({
 })
 
 onMounted(() => {
+  Home.getData()
   setInterval(() => {
     Home.getData()
-  }, 5000)
+  }, 10 * 1000)
 })
 </script>
 
