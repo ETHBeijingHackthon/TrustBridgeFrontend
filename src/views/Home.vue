@@ -4,7 +4,7 @@ import { useAccount } from 'vagmi'
 import { useRouter } from 'vue-router'
 import Category from '@/contants/category'
 import { ShowCard, Post } from '@/components'
-import { getNftcreatedEntities, getNftcollectedEntities } from '@/apis'
+import { getNftcreatedEntities, getNftcollectedEntities, queryTrustBridge } from '@/apis'
 
 const pageSize = 10
 const { address, isConnected } = useAccount()
@@ -12,11 +12,11 @@ const USE_ROUTER = useRouter()
 const Home = reactive({
   loading: false,
   skip: 0,
-  category: 'collected',
+  category: '1',
   list: [],
   getCreatedNft() {
     // Home.list = []
-    Home.loading = true
+    // Home.loading = true
     let query = ''
 
     switch (Home.category) {
@@ -39,14 +39,28 @@ const Home = reactive({
   getPosted() {
     Home.category = 'posted'
     Home.skip = 0
+    Home.loading = true
+    Home.list = []
     Home.getCreatedNft()
   },
   getCollected() {
     Home.category = 'collected'
     Home.skip = 0
-    getNftcollectedEntities(`first: 10, skip: 0, where: {collector: "${address.value}"}`)
+    Home.loading = true
+    Home.list = []
+    getNftcollectedEntities(`first: ${pageSize}, skip: ${Home.skip}, where: {collector: "${address.value}"}`)
       .then(res => {
-        console.log(res.nftcollectedEntities);
+        const ids = res.nftcollectedEntities.map(item => item.nftId)
+        queryTrustBridge(`{ nftcreatedEntities(where: { nftId_in: [${ids}], fid: 0 }, first: ${pageSize}) { id, nftId, owner, sort, coverUri, mediaType, multimedia, title, description, score, collectCount,reviewCount, fid } }`)
+          .then(res => {
+            Home.list = res.nftcreatedEntities
+          })
+          .finally(() => {
+            Home.loading = false
+          })
+      })
+      .catch(() => {
+        Home.loading = false
       })
   },
   getData() {
@@ -59,6 +73,8 @@ const Home = reactive({
   handleTabChange(key) {
     Home.category = key
     Home.skip = 0
+    Home.loading = true
+    Home.list = []
     Home.getCreatedNft()
   },
   handleToDetail(id) {
@@ -69,10 +85,14 @@ const Home = reactive({
   },
   handlePrev() {
     if (Home.skip == 0) return
+    Home.loading = true
+    Home.list = []
     Home.skip -= pageSize
     Home.getCreatedNft()
   },
   handleNext() {
+    Home.loading = true
+    Home.list = []
     Home.skip += pageSize
     Home.getCreatedNft()
   },
@@ -82,7 +102,7 @@ onMounted(() => {
   Home.getData()
   setInterval(() => {
     Home.getData()
-  }, 10 * 1000)
+  }, import.meta.env.VITE_REFRESH_DURATION * 1000)
 })
 </script>
 
@@ -99,13 +119,15 @@ onMounted(() => {
         <a-tab-pane v-for="item in Category" :key="item.key" :title="item.label">
         </a-tab-pane>
         <template #extra>
-          <a-button :disabled="!isConnected" class="ml-auto mr-4" size="large" @click="Home.getPosted">
+          <a-button :disabled="!isConnected" class="ml-auto mr-4"
+            :class="{ 'btn-tab-selected': Home.category === 'posted' }" size="large" @click="Home.getPosted">
             <template #icon>
               <icon-send :size="20" />
             </template>
             Posted
           </a-button>
-          <a-button :disabled="!isConnected" size="large" @click="Home.getCollected">
+          <a-button :class="{ 'btn-tab-selected': Home.category === 'collected' }" :disabled="!isConnected" size="large"
+            @click="Home.getCollected">
             <template #icon>
               <icon-star />
             </template>
@@ -120,7 +142,7 @@ onMounted(() => {
           </li>
         </ul>
       </a-spin>
-      <div class="text-center">
+      <div class="text-center mt-8">
         <a-button-group>
           <a-button :disabled="!Home.skip" type="primary" @click="Home.handlePrev">
             <icon-left />
@@ -178,6 +200,10 @@ onMounted(() => {
       &:nth-of-type(5n) {
         margin-right: 0;
       }
+    }
+
+    .btn-tab-selected {
+      border-color: #fff;
     }
   }
 }

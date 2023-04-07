@@ -1,7 +1,7 @@
 <script setup>
 import { ref, toRaw, reactive, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { useSigner } from 'vagmi'
+import { useSigner, useAccount } from 'vagmi'
 import { Message } from '@arco-design/web-vue'
 import { geneTrustBridgeContract } from '@/contracts'
 import Medias from '@/contants/media'
@@ -13,10 +13,12 @@ const formRef = ref(null)
 const mediaRef = ref(null)
 const { query: { id } } = useRoute()
 const { data } = useSigner()
+const { address } = useAccount()
 
 const Detail = reactive({
   disabledForm: false,
   disabledCollect: false,
+  ifCollected: false,
   data: {
     coverUri: '',
     sort: 1,
@@ -57,6 +59,13 @@ const Detail = reactive({
         Detail.comments = res.nftreviewedEntities
       })
   },
+  getIfCollect() {
+    queryTrustBridge(`{
+      nftcollectedEntities(first: 1, where: {nftId: "${parseInt(id.slice(2), 16)}", collector: "${address.value}"}) {id}}`)
+      .then(res => {
+        Detail.ifCollected = Boolean(res.nftcollectedEntities.length)
+      })
+  },
   handleSubmit({ values, errors }) {
     if (errors) return
     Detail.disabledForm = true
@@ -68,7 +77,6 @@ const Detail = reactive({
         formRef.value.resetFields()
         mediaRef.value.clearFiles()
         Message.success('Successfully posted!')
-        Detail.handleRefreshComment()
       })
       .catch(err => {
         console.log(err);
@@ -110,6 +118,11 @@ const Detail = reactive({
 
 onMounted(() => {
   Detail.getDetailAndComments()
+  Detail.getIfCollect()
+
+  setInterval(() => {
+    Detail.getDetailAndComments()
+  }, import.meta.env.VITE_REFRESH_DURATION * 1000);
 })
 </script>
 
@@ -132,7 +145,8 @@ onMounted(() => {
         </a-avatar-group>
         <span class="ml-1">{{ Detail.data.reviewCount }} commented</span>
       </div>
-      <a-button :disabled="Detail.disabledCollect" @click="Detail.handleCollect" class="ml-auto mr-4" size="large">
+      <a-button :disabled="Detail.disabledCollect || Detail.ifCollected" @click="Detail.handleCollect"
+        class="ml-auto mr-4" size="large">
         <template #icon>
           <icon-star :size="20" />
         </template>

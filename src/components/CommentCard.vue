@@ -24,10 +24,10 @@ defineProps({
         </a-avatar>
         <span class="ml-3">{{ formatAddress(data.reviewer) }}</span>
       </div>
-      <a-rate :default-value="data.score / 2" readonly disabled allow-half />
+      <a-rate :model-value="data.score / 2" disabled allow-half readonly />
     </div>
     <div class="mb-2">{{ data.description }}</div>
-    <div>
+    <div v-if="getCoverUri(data.multimedia)">
       <img :src="getCoverUri(data.multimedia)" alt="media">
     </div>
   </div>
@@ -36,6 +36,6 @@ defineProps({
 <style lang="less" scoped>
 .comment-card {
   border: 1px solid #525252;
-  @apply px-6 py-4 rounded-sm;
+  @apply px-6 py-4 rounded;
 }
 </style>
