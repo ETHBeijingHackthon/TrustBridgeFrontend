@@ -25,7 +25,7 @@ const { switchNetwork }
     }
   });
 const { disconnect } = useDisconnect()
-const { isConnected, address } = useAccount()
+const { address, status } = useAccount()
 const { connect, connectors, pendingConnector } = useConnect({
   onConnect: () => {
     ConnectWallet.visible = false
@@ -68,7 +68,7 @@ const handleDisconnect = () => {
       <li class="connector" v-for="connector in connectors" :key="connector.id" @click="connect(connector)">
         <span>{{ connector.name }}{{ !connector.ready ? ' (unsupported)' : '' }} {{
           connector.id ===
-          pendingConnector?.id && !isConnected
+          pendingConnector?.id && ['connecting', 'reconnecting'].indexOf(status) > -1
           ?
           ' (connecting)' : '' }}</span>
         <img :src="mapConnector[connector.id]" />
