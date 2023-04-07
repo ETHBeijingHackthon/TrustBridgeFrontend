@@ -12,7 +12,7 @@ const USE_ROUTER = useRouter()
 const Home = reactive({
   loading: false,
   skip: 0,
-  category: 'collected',
+  category: '1',
   list: [],
   getCreatedNft() {
     Home.list = []
