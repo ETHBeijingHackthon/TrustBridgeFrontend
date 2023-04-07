@@ -1,6 +1,8 @@
 <script setup>
 import { Header } from '@/components'
-import Logo from '@/assets/images/logo.svg'
+import QrCode from '@/assets/images/qrcode.jpg'
+
+const email = 'stoneprotocol@gmail.com'
 </script>
 
 <template>
@@ -15,8 +17,8 @@ import Logo from '@/assets/images/logo.svg'
       <div class="mb-10 text-xl font-bold">
         Join the WeChat group and bulid with us
       </div>
-      <img width="174" height="174" :src="Logo" alt="qrcode" class="mx-auto" />
-      <div class="text-[#999]">Mail: stoneprotocol@gmail.com</div>
+      <a-image width="174" :src="QrCode" class="mb-6" />
+      <div class="text-[#999] mb-2">Mail: <a :href="`mailto:${email}`">{{ email }}</a></div>
       <div class="text-[#999]">COPYRIGHT <icon-copyright /> 2023 TrustBridge Built with ❤. love.</div>
     </a-layout-footer>
     <a-back-top />

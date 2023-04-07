@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import ArcoVueIcon from '@arco-design/web-vue/es/icon'
 import '@arco-design/web-vue/es/notification/style/css.js'
+import '@arco-design/web-vue/es/message/style/css.js'
 import { VagmiPlugin } from 'vagmi'
 import { client } from '@/utils/vagmi'
 import router from './router'

@@ -1,72 +1,38 @@
 <script setup>
-import { reactive, toRaw, watch } from 'vue'
-import { useSigner, useAccount } from 'vagmi'
+import { reactive, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import Category from '@/contants/category'
 import { ShowCard, Post } from '@/components'
-import { geneTrustBridgeContract } from '@/contracts'
+import { getNftcreatedEntities } from '@/apis'
 
-const { data } = useSigner()
-const { isConnected } = useAccount()
-
+const USE_ROUTER = useRouter()
 const Home = reactive({
-  list: [
-    {
-      imgUrl: 'https://img1.baidu.com/it/u=3166229769,3131490154&fm=253&fmt=auto&app=120&f=JPEG?w=700&h=1000',
-      category: 2,
-      title: 'title',
-      rates: ['a', 'b'],
-      point: 3
-    },
-    {
-      imgUrl: 'https://img1.baidu.com/it/u=3166229769,3131490154&fm=253&fmt=auto&app=120&f=JPEG?w=700&h=1000',
-      category: 2,
-      title: 'title',
-      rates: ['a', 'b'],
-      point: 3
-    },
-    {
-      imgUrl: 'https://img1.baidu.com/it/u=3166229769,3131490154&fm=253&fmt=auto&app=120&f=JPEG?w=700&h=1000',
-      category: 2,
-      title: 'title',
-      rates: ['a', 'b'],
-      point: 3
-    },
-    {
-      imgUrl: 'https://img1.baidu.com/it/u=3166229769,3131490154&fm=253&fmt=auto&app=120&f=JPEG?w=700&h=1000',
-      category: 2,
-      title: 'title',
-      rates: ['a', 'b'],
-      point: 3
-    },
-    {
-      imgUrl: 'https://img1.baidu.com/it/u=3166229769,3131490154&fm=253&fmt=auto&app=120&f=JPEG?w=700&h=1000',
-      category: 2,
-      title: 'title',
-      rates: ['a', 'b'],
-      point: 3
-    },
-    {
-      imgUrl: 'https://img1.baidu.com/it/u=3166229769,3131490154&fm=253&fmt=auto&app=120&f=JPEG?w=700&h=1000',
-      category: 2,
-      title: 'title',
-      rates: ['a', 'b'],
-      point: 3
-    },
-    {
-      imgUrl: 'https://img1.baidu.com/it/u=3166229769,3131490154&fm=253&fmt=auto&app=120&f=JPEG?w=700&h=1000',
-      category: 2,
-      title: 'title',
-      rates: ['a', 'b'],
-      point: 3
-    },
-    {
-      imgUrl: 'https://img1.baidu.com/it/u=3166229769,3131490154&fm=253&fmt=auto&app=120&f=JPEG?w=700&h=1000',
-      category: 2,
-      title: 'title',
-      rates: ['a', 'b'],
-      point: 3
-    },
-  ]
+  loading: false,
+  list: [],
+  getCreatedNft(query) {
+    Home.list = []
+    Home.loading = true
+    getNftcreatedEntities(query)
+      .then(res => {
+        Home.list = res.nftcreatedEntities
+      })
+      .finally(() => {
+        Home.loading = false
+      })
+  },
+  handleTabChange(key) {
+    Home.getCreatedNft(`where: {fid: 0${key == '1' ? '' : `, sort: "${key}"`}}, first: 10`)
+  },
+  handleToDetail(id) {
+    USE_ROUTER.push({
+      path: '/detail',
+      query: { id }
+    })
+  }
+})
+
+onMounted(() => {
+  Home.getCreatedNft(`where: {fid: 0}, first: 10`)
 })
 </script>
 
@@ -79,7 +45,7 @@ const Home = reactive({
       </Post>
     </div>
     <div class="home__bottom">
-      <a-tabs default-active-key="1" size="large">
+      <a-tabs default-active-key="1" size="large" @change="Home.handleTabChange">
         <a-tab-pane v-for="item in Category" :key="item.key" :title="item.label">
         </a-tab-pane>
         <template #extra>
@@ -97,11 +63,23 @@ const Home = reactive({
           </a-button>
         </template>
       </a-tabs>
-      <ul class="flex flex-wrap mt-7">
-        <li class="home__bottom__card" v-for="(item, index) in Home.list" :key="index">
-          <ShowCard :data="item" />
-        </li>
-      </ul>
+      <a-spin :loading="Home.loading" tip="Loading..." class="w-full">
+        <ul class="flex flex-wrap mt-7 min-h-[400px]">
+          <li class="home__bottom__card" v-for="item in Home.list" :key="item.id">
+            <ShowCard :data="item" @click="Home.handleToDetail(item.id)" />
+          </li>
+        </ul>
+      </a-spin>
+      <a-button-group>
+        <a-button type="primary">
+          <icon-left />
+          Prev
+        </a-button>
+        <a-button type="primary">
+          Next
+          <icon-right />
+        </a-button>
+      </a-button-group>
     </div>
   </div>
 </template>
@@ -109,6 +87,7 @@ const Home = reactive({
 <style lang="less" scoped>
 .home {
   &__top {
+    min-height: 500px;
     height: calc(100vh - 154px);
     @apply pt-48 text-center;
   }

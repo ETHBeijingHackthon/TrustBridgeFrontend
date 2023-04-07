@@ -1,4 +1,4 @@
-const address = '0xFC4FDB49c63f4169c3AEC92b8413598258F9cFd1'
+const address = import.meta.env.VITE_CONTRACT_TRUSTBRIDGE_ADDRESS
 
 const abi = [
   { inputs: [], stateMutability: 'nonpayable', type: 'constructor' },
@@ -88,6 +88,12 @@ const abi = [
       {
         indexed: false,
         internalType: 'string',
+        name: 'mediaType',
+        type: 'string',
+      },
+      {
+        indexed: false,
+        internalType: 'string',
         name: 'multimedia',
         type: 'string',
       },
@@ -150,6 +156,12 @@ const abi = [
       {
         indexed: false,
         internalType: 'string',
+        name: 'mediaType',
+        type: 'string',
+      },
+      {
+        indexed: false,
+        internalType: 'string',
         name: 'multimedia',
         type: 'string',
       },
@@ -200,6 +212,7 @@ const abi = [
     inputs: [
       { internalType: 'string', name: '_sort', type: 'string' },
       { internalType: 'string', name: '_coverURI', type: 'string' },
+      { internalType: 'string', name: '_mediaType', type: 'string' },
       { internalType: 'string', name: '_multimedia', type: 'string' },
       { internalType: 'string', name: '_title', type: 'string' },
       { internalType: 'string', name: '_description', type: 'string' },
@@ -249,6 +262,7 @@ const abi = [
       { internalType: 'string', name: 'sort', type: 'string' },
       { internalType: 'address', name: 'owner', type: 'address' },
       { internalType: 'string', name: 'coverURI', type: 'string' },
+      { internalType: 'string', name: 'mediaType', type: 'string' },
       { internalType: 'string', name: 'multimedia', type: 'string' },
       { internalType: 'string', name: 'title', type: 'string' },
       { internalType: 'string', name: 'description', type: 'string' },
@@ -271,6 +285,7 @@ const abi = [
       { internalType: 'uint256', name: '_nftId', type: 'uint256' },
       { internalType: 'uint256', name: '_score', type: 'uint256' },
       { internalType: 'string', name: '_description', type: 'string' },
+      { internalType: 'string', name: '_mediaType', type: 'string' },
       { internalType: 'string', name: '_multimedia', type: 'string' },
     ],
     name: 'reviewNFT',

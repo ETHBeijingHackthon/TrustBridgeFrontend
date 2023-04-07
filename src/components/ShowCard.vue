@@ -1,34 +1,30 @@
 <script setup>
-import { useRouter } from 'vue-router'
 import { Category } from '@/components'
-import { getAvatar } from '@/utils/common'
+import { getAvatar, getCoverUri } from '@/utils/common'
 
-const USE_ROUTER = useRouter()
 defineProps({
   data: {
     type: Object,
     default: () => ({
-      imgUrl: '',
+      coverUri: '',
       title: '',
-      category: 0,
+      sort: 0,
       title: '',
       rates: [],
-      point: 0
+      score: 0
     })
   }
 })
-
-const toDetail = () => {
-  USE_ROUTER.push('/detail')
-}
 </script>
 
 <template>
-  <div class="show-card rounded cursor-pointer" @click="toDetail">
-    <img style="width: 100%; height: 230px" class="mb-3 object-cover object-center rounded overflow-hidden"
-      :src="data.imgUrl" alt="cover">
+  <div class="show-card rounded cursor-pointer">
+    <div class="mb-3 rounded overflow-hidden" style="background: rgba(0, 0, 0, .1)">
+      <img style="width: 100%; height: 230px" class="object-cover object-center" :src="getCoverUri(data.coverUri)"
+        alt="cover">
+    </div>
     <div class="px-5 pt-2 pb-4">
-      <Category class="mb-1" :category="data.category" />
+      <Category class="mb-1" :category="data.sort" />
       <div class="mb-2 break-words">{{ data.title }}</div>
       <div class="mb-2">
         <a-avatar-group :size="24" :max-count="3">
@@ -37,9 +33,9 @@ const toDetail = () => {
           </a-avatar>
         </a-avatar-group>
       </div>
-      <div>
-        <a-rate :default-value="data.point" readonly disabled />
-        <span>{{ data.point }}</span>
+      <div class="flex justify-between items-center">
+        <a-rate :default-value="+data.score" readonly disabled />
+        <span>{{ +data.score && (+data.score).toFixed(1) }}</span>
       </div>
     </div>
   </div>

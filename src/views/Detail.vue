@@ -1,17 +1,33 @@
 <script setup>
-import { reactive } from 'vue'
+import { reactive, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { Category, Upload, CommentCard } from '@/components'
-import { getAvatar } from '@/utils/common'
+import { getAvatar, getCoverUri, formatAddress } from '@/utils/common'
+import { getNftcreatedEntities } from '@/apis'
 
+const { query: { id } } = useRoute()
+
+console.log(id)
 const Detail = reactive({
-  imgUrl: 'https://img1.baidu.com/it/u=3166229769,3131490154&fm=253&fmt=auto&app=120&f=JPEG?w=700&h=1000',
-  category: 2,
-  title: 'titletitletitletitletitletitletitletitletitletitletitletitle',
-  postBy: '0x333....423d',
-  point: 3,
-  collect: 2,
-  rates: ['a', 'b'],
-  description: `Top Gun is a science fiction adventure film directed by Steven Spielberg, written by Zach Payne and Ernst Cline, and starring Tere Sheridan, Olivia Cooke, Simon Pegg, Ben Mendelsohn, Mark Rylance and T.J. Miller, released in China on March 30, 2018. Based on Ernst Cline's novel of the same name, the film tells the story of an older boy who has nothing to hold on to in real life and is addicted to games.With an in-depth analysis of the virtual game designer, he goes through trials and tribulations to find the three keys hidden in the levels, `,
+  data: {
+    coverUri: '',
+    sort: 1,
+    title: '',
+    owner: '',
+    score: 0,
+    collectCount: 0,
+    reviewCount: 0,
+    description: ''
+  },
+  coverUri: '',
+  sort: 1,
+  title: '',
+  owner: '',
+  score: 0,
+  collectCount: 2,
+  reviewCount: 0,
+  // rates: ['a', 'b'],
+  description: '',
   form: {
     point: 0,
     comments: '',
@@ -25,7 +41,21 @@ const Detail = reactive({
       comment: 'desc',
       media: '1'
     }
-  ]
+  ],
+  getDetail() {
+    getNftcreatedEntities(`where: {id: "${id}"}, first: 1`)
+      .then(res => {
+        const data = res.nftcreatedEntities[0]
+        if (data) {
+          Detail.data = data
+          Detail.data.coverUri = getCoverUri(data.coverUri)
+        }
+      })
+  }
+})
+
+onMounted(() => {
+  Detail.getDetail()
 })
 </script>
 
@@ -33,32 +63,32 @@ const Detail = reactive({
   <div class="detail flex justify-center pt-16">
     <div class="detail__left w-[380px] mr-20 text-center">
       <div class="detail__left__image mb-7 rounded">
-        <img :src="Detail.imgUrl" style="width: 368px; height: 368px"
+        <img :src="Detail.data.coverUri" style="width: 368px; height: 368px"
           class="rounded overflow-hidden object-cover object-center" alt="item cover">
       </div>
-      <Category :category="Detail.category" class="justify-center mb-2" :showLable="true" />
-      <div class="mb-4 text-4xl break-words">{{ Detail.title }}</div>
-      <div class="mb-6 text-[#B9B9B9]">Posted by {{ Detail.postBy }}</div>
-      <div class="mb-2 text-3xl">{{ Detail.point.toFixed(1) }}</div>
-      <a-rate :model-value="Detail.point" disabled />
+      <Category :category="Detail.data.sort" class="justify-center mb-2" :showLable="true" />
+      <div class="mb-4 text-4xl break-words">{{ Detail.data.title }}</div>
+      <div class="mb-6 text-[#B9B9B9]">Posted by {{ formatAddress(Detail.data.owner) }}</div>
+      <div class="mb-2 text-3xl">{{ +Detail.data.score && (+Detail.data.score).toFixed(1) }}</div>
+      <a-rate :model-value="Detail.data.score" disabled />
       <div class="mt-4 mb-6 text-[#B9B9B9]">
-        <a-avatar-group :size="24" :max-count="3">
-          <a-avatar v-for="(item, index) in Detail.rates" :key="index">
-            <img :src="getAvatar(item)" />
-          </a-avatar>
-        </a-avatar-group>
-        <span>12+</span>
+        <!-- <a-avatar-group :size="24" :max-count="3">
+                          <a-avatar v-for="(item, index) in Detail.rates" :key="index">
+                            <img :src="getAvatar(item)" />
+                          </a-avatar>
+                        </a-avatar-group> -->
+        <span>{{ Detail.data.reviewCount }}</span>
       </div>
       <a-button class="ml-auto mr-4" size="large">
         <template #icon>
           <icon-star :size="20" />
         </template>
-        Collect ({{ Detail.collect }})
+        Collect ({{ Detail.data.collectCount }})
       </a-button>
     </div>
     <div class="detail__right w-[600px]">
       <div class="detail__right__title">Description</div>
-      <div class="detail__right__wrap mb-10">{{ Detail.description }}</div>
+      <div class="detail__right__wrap mb-10">{{ Detail.data.description }}</div>
       <div class="detail__right__title">Comment</div>
       <div class="detail__right__wrap mb-10">
         <a-form>
