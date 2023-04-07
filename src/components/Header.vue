@@ -1,9 +1,11 @@
 <script setup>
+import { useAccount } from 'vagmi'
 import { useRouter } from 'vue-router'
 import Logo from '@/assets/images/logo.svg'
 import { Post, ConnectWallet } from '@/components'
 
 const USE_ROUTER = useRouter()
+const { isConnected } = useAccount()
 
 const toHome = () => {
   USE_ROUTER.push('/')
@@ -19,7 +21,7 @@ const toHome = () => {
       <span class="ml-5">TrustBridge</span>
     </div>
     <Post class="ml-auto mr-4">
-      <a-button size="large">
+      <a-button size="large" :disabled="!isConnected">
         <template #icon>
           <icon-send :size="20" />
         </template>

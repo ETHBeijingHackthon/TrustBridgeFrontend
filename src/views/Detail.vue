@@ -13,7 +13,7 @@ const formRef = ref(null)
 const mediaRef = ref(null)
 const { query: { id } } = useRoute()
 const { data } = useSigner()
-const { address } = useAccount()
+const { address, isConnected } = useAccount()
 
 const Detail = reactive({
   disabledForm: false,
@@ -60,6 +60,7 @@ const Detail = reactive({
       })
   },
   getIfCollect() {
+    if (!isConnected.value) return
     queryTrustBridge(`{
       nftcollectedEntities(first: 1, where: {nftId: "${parseInt(id.slice(2), 16)}", collector: "${address.value}"}) {id}}`)
       .then(res => {
@@ -145,7 +146,7 @@ onMounted(() => {
         </a-avatar-group>
         <span class="ml-1">{{ Detail.data.reviewCount }} commented</span>
       </div>
-      <a-button :disabled="Detail.disabledCollect || Detail.ifCollected" @click="Detail.handleCollect"
+      <a-button :disabled="!isConnected || Detail.disabledCollect || Detail.ifCollected" @click="Detail.handleCollect"
         class="ml-auto mr-4" size="large">
         <template #icon>
           <icon-star :size="20" />
@@ -158,7 +159,8 @@ onMounted(() => {
       <div class="detail__right__wrap mb-10">{{ Detail.data.description }}</div>
       <div class="detail__right__title">Comment</div>
       <div class="detail__right__wrap mb-10">
-        <a-form ref="formRef" :model="Detail.form" :disabled="Detail.disabledForm" @submit="Detail.handleSubmit">
+        <a-form ref="formRef" :model="Detail.form" :disabled="Detail.disabledForm || !isConnected"
+          @submit="Detail.handleSubmit">
           <a-form-item field="point" label="Point" :rules="[{ type: 'number', min: 0.5 }]" required>
             <a-rate v-model="Detail.form.point" :count="5" allow-half />
           </a-form-item>

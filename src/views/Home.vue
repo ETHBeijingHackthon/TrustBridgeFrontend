@@ -111,7 +111,7 @@ onMounted(() => {
     <div class="home__top">
       <h1 class="text-[48px] font-bold">Build and discover trust.</h1>
       <Post>
-        <a-button size="large" type="primary">Post New Item</a-button>
+        <a-button :disabled="!isConnected" size="large" type="primary">Post New Item</a-button>
       </Post>
     </div>
     <div class="home__bottom">
