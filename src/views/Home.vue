@@ -19,11 +19,9 @@ const Home = reactive({
     // Home.loading = true
     let query = ''
 
-    console.log(Category.map(cate => cate.key));
-
     switch (Home.category) {
       case 'posted':
-        query = `where: {fid: 0, owner: "${address.value}"}, first: ${pageSize}, skip: ${Home.skip}`
+        query = `where: {fid: 0, owner: "${address.value}", sort_in: [${Category.map(cate => '"' + cate.key + '"')}]}, first: ${pageSize}, skip: ${Home.skip}`
         break
 
       default:
@@ -49,12 +47,12 @@ const Home = reactive({
   getCollected() {
     Home.category = 'collected'
     Home.skip = 0
-    Home.loading = true
-    Home.list = []
+    // Home.loading = true
+    // Home.list = []
     getNftcollectedEntities(`first: ${pageSize}, skip: ${Home.skip}, where: {collector: "${address.value}"}`)
       .then(res => {
         const ids = res.nftcollectedEntities.map(item => item.nftId)
-        queryTrustBridge(`{ nftcreatedEntities(where: { nftId_in: [${ids}], fid: 0 }, first: ${pageSize}) { id, nftId, owner, sort, coverUri, mediaType, multimedia, title, description, score, collectCount,reviewCount, fid } }`)
+        queryTrustBridge(`{ nftcreatedEntities(where: { nftId_in: [${ids}], sort_in: [${Category.map(cate => '"' + cate.key + '"')}], fid: 0 }, first: ${pageSize}) { id, nftId, owner, sort, coverUri, mediaType, multimedia, title, description, score, collectCount,reviewCount, fid } }`)
           .then(res => {
             Home.list = res.nftcreatedEntities
           })

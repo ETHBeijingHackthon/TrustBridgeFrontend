@@ -150,7 +150,6 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  console.log(si);
   if (si) clearInterval(si)
 })
 </script>
@@ -179,12 +178,12 @@ onBeforeUnmount(() => {
           <DefaultCover class="h-full" :sort="Detail.data.sort" v-else />
         </template>
         <!-- <a-image v-if="getCoverUri(Detail.data.coverUri)" :src="getCoverUri(Detail.data.coverUri)" width="368"
-              height="356" fit="cover" />
-            <DefaultCover class="h-full" :sort="Detail.data.sort" v-else />
-            <div v-if="Detail.data.mediaType && getCoverUri(Detail.data.multimedia)"
-              class="play absolute top-0 bottom-0 left-0 right-0 bg-black/70 z-10 flex items-center justify-center">
-              <icon-play-circle-fill :size="68" class="cursor-pointer" @click="Detail.handleOpenPlay" />
-            </div> -->
+                height="356" fit="cover" />
+              <DefaultCover class="h-full" :sort="Detail.data.sort" v-else />
+              <div v-if="Detail.data.mediaType && getCoverUri(Detail.data.multimedia)"
+                class="play absolute top-0 bottom-0 left-0 right-0 bg-black/70 z-10 flex items-center justify-center">
+                <icon-play-circle-fill :size="68" class="cursor-pointer" @click="Detail.handleOpenPlay" />
+              </div> -->
       </div>
       <Category :category="Detail.data.sort" class="justify-center mb-2" :showLable="true" />
       <div class="mb-4 text-4xl break-words">{{ Detail.data.title }}</div>
