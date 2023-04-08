@@ -13,7 +13,7 @@ const props = defineProps({
   }
 })
 
-const currentCate = computed(() => Category.filter(item => +item.key === +props.category)[0])
+const currentCate = computed(() => Category.filter(item => item.key === props.category)[0])
 </script>
 
 <template>
