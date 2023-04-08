@@ -45,8 +45,9 @@ const handleCloseModal = () => {
     </div>
     <div class="mb-2">{{ data.description }}</div>
     <div v-if="getCoverUri(data.multimedia)">
-      <a-image v-if="data.mediaType == '1'" width="200" height="200" fit="cover" :src="getCoverUri(data.multimedia)" />
-      <a-button shape="round" @click="handlePlay" v-else-if="data.mediaType == '2' || data.mediaType == '3'">
+      <a-image v-if="data.mediaType == 'image'" width="200" height="200" fit="cover"
+        :src="getCoverUri(data.multimedia)" />
+      <a-button shape="round" @click="handlePlay" v-else-if="data.mediaType == 'video'">
         <icon-play-arrow-fill /> <span class="ml-1">Play</span>
       </a-button>
     </div>
