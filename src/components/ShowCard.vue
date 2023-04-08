@@ -25,7 +25,7 @@ defineProps({
     </div>
     <div class="px-5 pt-2 pb-4">
       <Category class="mb-1" :category="data.sort" />
-      <div class="mb-2 break-words">{{ data.title }}</div>
+      <div class="mb-2 break-words truncate">{{ data.title }}</div>
       <div class="mb-2">
         <a-avatar-group :size="24" :max-count="3">
           <a-avatar v-for="(item, index) in +data.reviewCount < 3 ? +data.reviewCount : 3 " :key="index">

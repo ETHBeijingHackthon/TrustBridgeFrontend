@@ -7,7 +7,7 @@ export default [
   {
     key: '7',
     label: 'ETH Beijing',
-    className: '',
+    className: 'icon-ethbeijing',
   },
   {
     key: '2',

@@ -67,6 +67,11 @@ const Post = reactive({
   },
   handleUploadChange() {
     Post.disabledSubmit = true
+  },
+  handleCloseModal() {
+    formRef.value.resetFields()
+    coverRef.value.clearFiles()
+    mediaRef.value.clearFiles()
   }
 })
 </script>
@@ -77,7 +82,7 @@ const Post = reactive({
       <slot />
     </div>
 
-    <a-modal v-model:visible="Post.visible" :footer="false" title="Post a new item">
+    <a-modal v-model:visible="Post.visible" :footer="false" title="Post a new item" @close="Post.handleCloseModal">
       <a-form :model="Post.form" :disabled="Post.disabled" ref="formRef" layout="vertical" @submit="Post.handleSubmit">
         <a-form-item field="title" label="Title" required>
           <a-input v-model="Post.form.title" placeholder="please enter title..." />
