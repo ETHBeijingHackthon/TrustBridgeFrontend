@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, onMounted } from 'vue'
+import { reactive, onMounted, onBeforeUnmount } from 'vue'
 import { useAccount } from 'vagmi'
 import { useRouter } from 'vue-router'
 import Category from '@/contants/category'
@@ -19,13 +19,15 @@ const Home = reactive({
     // Home.loading = true
     let query = ''
 
+    console.log(Category.map(cate => cate.key));
+
     switch (Home.category) {
       case 'posted':
         query = `where: {fid: 0, owner: "${address.value}"}, first: ${pageSize}, skip: ${Home.skip}`
         break
 
       default:
-        query = `where: {fid: 0${Home.category == '1' ? '' : `, sort: "${Home.category}"`}}, first: ${pageSize}, skip: ${Home.skip}`
+        query = `where: {fid: 0${Home.category == '1' ? `, sort_in: [${Category.map(cate => '"' + cate.key + '"')}]` : `, sort: "${Home.category}"`}}, first: ${pageSize}, skip: ${Home.skip}`
         break
     }
 
@@ -99,11 +101,17 @@ const Home = reactive({
   },
 })
 
+let si;
+
 onMounted(() => {
   Home.getData()
-  setInterval(() => {
+  si = setInterval(() => {
     Home.getData()
   }, import.meta.env.VITE_REFRESH_DURATION * 1000)
+})
+
+onBeforeUnmount(() => {
+  if (si) clearInterval(si)
 })
 </script>
 

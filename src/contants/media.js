@@ -1,14 +1,14 @@
 export default [
   {
-    label: 'img',
-    key: 1,
+    label: 'image',
+    key: 'image',
   },
   {
     label: 'video',
-    key: 2,
+    key: 'video',
   },
-  {
-    label: 'audio',
-    key: 3,
-  },
+  // {
+  //   label: 'audio',
+  //   key: 'audio',
+  // },
 ]

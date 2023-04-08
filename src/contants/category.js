@@ -4,33 +4,70 @@ export default [
     label: 'All',
     className: '',
   },
+  // {
+  //   key: 'test',
+  //   label: 'test',
+  //   className: 'icon-ethbeijing',
+  // },
+  // {
+  //   key: '7',
+  //   label: 'ETH Beijing',
+  //   className: 'icon-ethbeijing',
+  // },
+  // {
+  //   key: '2',
+  //   label: 'Game',
+  //   className: 'icon-game',
+  // },
+  // {
+  //   key: '3',
+  //   label: 'Movie',
+  //   className: 'icon-movie',
+  // },
+  // {
+  //   key: '4',
+  //   label: 'Book',
+  //   className: 'icon-book',
+  // },
+  // {
+  //   key: '5',
+  //   label: 'Music',
+  //   className: 'icon-music',
+  // },
+  // {
+  //   key: '6',
+  //   label: 'Food',
+  //   className: 'icon-food',
+  // },
+
+  // new
   {
-    key: '7',
+    key: 'ethbeijing',
     label: 'ETH Beijing',
     className: 'icon-ethbeijing',
   },
   {
-    key: '2',
+    key: 'game',
     label: 'Game',
     className: 'icon-game',
   },
   {
-    key: '3',
+    key: 'movie',
     label: 'Movie',
     className: 'icon-movie',
   },
   {
-    key: '4',
+    key: 'book',
     label: 'Book',
     className: 'icon-book',
   },
   {
-    key: '5',
+    key: 'music',
     label: 'Music',
     className: 'icon-music',
   },
   {
-    key: '6',
+    key: 'food',
     label: 'Food',
     className: 'icon-food',
   },

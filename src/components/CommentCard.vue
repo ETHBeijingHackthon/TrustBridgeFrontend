@@ -1,7 +1,8 @@
 <script setup>
+import { ref, nextTick } from 'vue'
 import { getAvatar, formatAddress, getCoverUri } from '@/utils/common'
 
-defineProps({
+const props = defineProps({
   data: {
     type: Object,
     default: () => ({
@@ -13,6 +14,22 @@ defineProps({
     })
   }
 })
+
+const videoRef = ref(null)
+const visiblePlayer = ref(false)
+const mediaSrc = ref('')
+
+const handlePlay = async () => {
+  visiblePlayer.value = true
+  mediaSrc.value = getCoverUri(props.data.multimedia)
+  await nextTick()
+  videoRef.value.load()
+  videoRef.value.play()
+}
+
+const handleCloseModal = () => {
+  videoRef.value.pause()
+}
 </script>
 
 <template>
@@ -28,9 +45,17 @@ defineProps({
     </div>
     <div class="mb-2">{{ data.description }}</div>
     <div v-if="getCoverUri(data.multimedia)">
-      <a-image width="200" height="200" fit="cover" :src="getCoverUri(data.multimedia)" />
+      <a-image v-if="data.mediaType == '1'" width="200" height="200" fit="cover" :src="getCoverUri(data.multimedia)" />
+      <a-button shape="round" @click="handlePlay" v-else-if="data.mediaType == '2' || data.mediaType == '3'">
+        <icon-play-arrow-fill /> <span class="ml-1">Play</span>
+      </a-button>
     </div>
   </div>
+  <a-modal title="Player" v-model:visible="visiblePlayer" @close="handleCloseModal" :width="520" :footer="false" simple>
+    <video ref="videoRef" controls="controls" autoplay="autoplay" class="w-full object-contain">
+      <source :src="mediaSrc" type="video/mp4" />
+    </video>
+  </a-modal>
 </template>
 
 <style lang="less" scoped>

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, toRaw, reactive, onMounted, nextTick } from 'vue'
+import { ref, toRaw, reactive, onMounted, nextTick, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import { useSigner, useAccount } from 'vagmi'
 import { Message } from '@arco-design/web-vue'
@@ -36,7 +36,7 @@ const Detail = reactive({
   form: {
     point: 0,
     comments: '',
-    mediaType: '1',
+    mediaType: 1,
     multiMedia: '',
   },
   comments: [
@@ -120,10 +120,12 @@ const Detail = reactive({
   },
   async handleOpenPlay() {
     Detail.visiblePlayer = true
-    Detail.mediaSrc = getCoverUri(Detail.data.multimedia)
-    await nextTick()
-    videoRef.value.load()
-    videoRef.value.play()
+    if (Detail.data.mediaType == 'video') {
+      Detail.mediaSrc = getCoverUri(Detail.data.multimedia)
+      await nextTick()
+      videoRef.value.load()
+      videoRef.value.play()
+    }
   },
   handleUploadChange() {
     Detail.disabledSubmit = true
@@ -131,15 +133,25 @@ const Detail = reactive({
   handleUploadEnd() {
     Detail.disabledSubmit = false
   },
+  handleCloseModal() {
+    videoRef.value.pause()
+  }
 })
+
+let si;
 
 onMounted(() => {
   Detail.getDetailAndComments()
   Detail.getIfCollect()
 
-  setInterval(() => {
+  si = setInterval(() => {
     Detail.getDetailAndComments()
   }, import.meta.env.VITE_REFRESH_DURATION * 1000);
+})
+
+onBeforeUnmount(() => {
+  console.log(si);
+  if (si) clearInterval(si)
 })
 </script>
 
@@ -147,14 +159,32 @@ onMounted(() => {
   <div class="detail flex justify-center pt-16">
     <div class="detail__left w-[380px] mr-20 text-center">
       <div class="detail__left__image mb-7 rounded h-[368px] relative">
-        <a-image v-if="getCoverUri(Detail.data.coverUri)" :src="getCoverUri(Detail.data.coverUri)" width="368"
-          height="356" fit="cover" />
-        <DefaultCover class="h-full" :sort="Detail.data.sort" v-else />
-        <!-- media -->
-        <div v-if="['3', '5'].indexOf(Detail.data.sort) > -1 && getCoverUri(Detail.data.multimedia)"
-          class="play absolute top-0 bottom-0 left-0 right-0 bg-black/70 z-10 flex items-center justify-center">
-          <icon-play-circle-fill :size="68" class="cursor-pointer" @click="Detail.handleOpenPlay" />
-        </div>
+        <template v-if="Detail.data.mediaType == 'video'">
+          <a-image v-if="getCoverUri(Detail.data.coverUri)" :src="getCoverUri(Detail.data.coverUri)" width="368"
+            height="356" fit="cover" />
+          <DefaultCover class="h-full" :sort="Detail.data.sort" v-else />
+          <!-- media -->
+          <div v-if="Detail.data.mediaType && getCoverUri(Detail.data.multimedia)"
+            class="play absolute top-0 bottom-0 left-0 right-0 bg-black/70 z-10 flex items-center justify-center">
+            <icon-play-circle-fill :size="68" class="cursor-pointer" @click="Detail.handleOpenPlay" />
+          </div>
+        </template>
+        <template v-else-if="Detail.data.mediaType == 'image'">
+          <a-image v-if="getCoverUri(Detail.data.multimedia)" :src="getCoverUri(Detail.data.multimedia)" width="368"
+            height="356" fit="cover" />
+        </template>
+        <template v-else="">
+          <a-image v-if="getCoverUri(Detail.data.coverUri)" :src="getCoverUri(Detail.data.coverUri)" width="368"
+            height="356" fit="cover" />
+          <DefaultCover class="h-full" :sort="Detail.data.sort" v-else />
+        </template>
+        <!-- <a-image v-if="getCoverUri(Detail.data.coverUri)" :src="getCoverUri(Detail.data.coverUri)" width="368"
+              height="356" fit="cover" />
+            <DefaultCover class="h-full" :sort="Detail.data.sort" v-else />
+            <div v-if="Detail.data.mediaType && getCoverUri(Detail.data.multimedia)"
+              class="play absolute top-0 bottom-0 left-0 right-0 bg-black/70 z-10 flex items-center justify-center">
+              <icon-play-circle-fill :size="68" class="cursor-pointer" @click="Detail.handleOpenPlay" />
+            </div> -->
       </div>
       <Category :category="Detail.data.sort" class="justify-center mb-2" :showLable="true" />
       <div class="mb-4 text-4xl break-words">{{ Detail.data.title }}</div>
@@ -200,7 +230,7 @@ onMounted(() => {
           </a-form-item>
           <a-form-item field="mediaType" label="Media">
             <a-radio-group v-model="Detail.form.mediaType">
-              <a-radio :value="media.key" v-for="media in   Medias" :key="media.key">{{ media.label }}</a-radio>
+              <a-radio :value="media.key" v-for="media in  Medias" :key="media.key">{{ media.label }}</a-radio>
             </a-radio-group>
           </a-form-item>
           <a-form-item field="multiMedia">
@@ -224,8 +254,13 @@ onMounted(() => {
       </div>
     </div>
   </div>
-  <a-modal title="Player" v-model:visible="Detail.visiblePlayer" :width="520" :footer="false" simple>
-    <video ref="videoRef" controls="controls" autoplay="autoplay" class="w-full object-contain">
+  <a-modal title="Player" v-model:visible="Detail.visiblePlayer" @close="Detail.handleCloseModal" :width="520"
+    :footer="false" simple>
+    <div v-if="Detail.data.mediaType == 'image'" class="flex items-center justify-center">
+      <a-image :src="getCoverUri(Detail.data.multimedia)" :width="400" :height="400" />
+    </div>
+    <video v-else-if="Detail.data.mediaType == 'video'" ref="videoRef" controls="controls" autoplay="autoplay"
+      class="w-full object-contain">
       <source :src="Detail.mediaSrc" type="video/mp4" />
     </video>
   </a-modal>
