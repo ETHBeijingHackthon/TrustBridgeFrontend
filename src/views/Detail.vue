@@ -19,6 +19,7 @@ const { address, isConnected } = useAccount()
 const Detail = reactive({
   disabledForm: false,
   disabledCollect: false,
+  disabledSubmit: false,
   ifCollected: false,
   visiblePlayer: false,
   mediaSrc: '',
@@ -123,7 +124,13 @@ const Detail = reactive({
     await nextTick()
     videoRef.value.load()
     videoRef.value.play()
-  }
+  },
+  handleUploadChange() {
+    Detail.disabledSubmit = true
+  },
+  handleUploadEnd() {
+    Detail.disabledSubmit = false
+  },
 })
 
 onMounted(() => {
@@ -177,7 +184,7 @@ onMounted(() => {
     </div>
     <div class="detail__right w-[600px]">
       <div class="detail__right__title">Description</div>
-      <div class="detail__right__wrap mb-10 text-base">{{ Detail.data.description }}</div>
+      <div class="mb-10 text-base text-[#B9B9B9] text-justify">{{ Detail.data.description }}</div>
       <div class="detail__right__title">Comment</div>
       <div class="detail__right__wrap mb-10">
         <a-form ref="formRef" :model="Detail.form" :disabled="Detail.disabledForm || !isConnected"
@@ -197,10 +204,12 @@ onMounted(() => {
             </a-radio-group>
           </a-form-item>
           <a-form-item field="multiMedia">
-            <Upload ref="mediaRef" @onSuccess="Detail.handleCoverUpload" />
+            <Upload ref="mediaRef" :sort="Detail.form.mediaType" @onChange="Detail.handleUploadChange"
+              @onEnd="Detail.handleUploadEnd" @onSuccess="Detail.handleCoverUpload" />
           </a-form-item>
           <a-form-item>
-            <a-button type="primary" size="large" html-type="submit" long>Submit</a-button>
+            <a-button :disabled="Detail.disabledSubmit" type="primary" size="large" html-type="submit"
+              long>Submit</a-button>
           </a-form-item>
         </a-form>
       </div>

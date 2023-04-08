@@ -17,6 +17,7 @@ const mediaRef = ref(null)
 const Post = reactive({
   visible: false,
   disabled: false,
+  disabledSubmit: false,
   form: {
     title: '',
     category: '',
@@ -60,6 +61,12 @@ const Post = reactive({
     }
 
     Post.visible = true
+  },
+  handleUploadEnd() {
+    Post.disabledSubmit = false
+  },
+  handleUploadChange() {
+    Post.disabledSubmit = true
   }
 })
 </script>
@@ -87,7 +94,8 @@ const Post = reactive({
           }" />
         </a-form-item>
         <a-form-item field="cover" label="Cover">
-          <Upload ref="coverRef" :ifCover="true" @onSuccess="Post.handleCoverUpload" />
+          <Upload ref="coverRef" :ifCover="true" @onChange="Post.handleUploadChange" @onEnd="Post.handleUploadEnd"
+            @onSuccess="Post.handleCoverUpload" />
         </a-form-item>
         <a-form-item field="mediaCate" label="Media">
           <a-radio-group v-model="Post.form.mediaCate">
@@ -95,10 +103,11 @@ const Post = reactive({
           </a-radio-group>
         </a-form-item>
         <a-form-item filed="media">
-          <Upload ref="mediaRef" @onSuccess="Post.handleMediaUpload" />
+          <Upload ref="mediaRef" @onChange="Post.handleUploadChange" @onEnd="Post.handleUploadEnd"
+            @onSuccess="Post.handleMediaUpload" />
         </a-form-item>
         <a-form-item>
-          <a-button type="primary" size="large" html-type="submit" long>Create</a-button>
+          <a-button :disabled="Post.disabledSubmit" type="primary" size="large" html-type="submit" long>Create</a-button>
         </a-form-item>
       </a-form>
     </a-modal>
