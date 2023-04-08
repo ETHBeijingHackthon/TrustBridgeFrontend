@@ -110,8 +110,8 @@ const Post = reactive({
           </a-radio-group>
         </a-form-item>
         <a-form-item filed="media">
-          <Upload ref="mediaRef" @onChange="Post.handleUploadChange" @onEnd="Post.handleUploadEnd"
-            @onSuccess="Post.handleMediaUpload" />
+          <Upload ref="mediaRef" :sort="Post.form.mediaCate" @onChange="Post.handleUploadChange"
+            @onEnd="Post.handleUploadEnd" @onSuccess="Post.handleMediaUpload" />
         </a-form-item>
         <a-form-item>
           <a-button :disabled="Post.disabledSubmit" type="primary" size="large" html-type="submit" long>Create</a-button>
