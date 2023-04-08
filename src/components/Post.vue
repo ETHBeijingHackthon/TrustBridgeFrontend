@@ -41,6 +41,8 @@ const Post = reactive({
         Message.success('Successfully posted！')
       })
       .catch(err => {
+        Post.disabled = false
+        wait.close()
         notiError(err.reason || err.message);
       })
       .finally(() => {

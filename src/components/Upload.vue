@@ -73,11 +73,11 @@ defineExpose({
             transform: 'translateX(-50%) translateY(-50%)',
           }" />
           <!-- <a-progress v-if="file.status === 'done'" type="circle" size="mini" status='success' :style="{
-                  position: 'absolute',
-                  left: '50%',
-                  top: '50%',
-                  transform: 'translateX(-50%) translateY(-50%)',
-                }" /> -->
+                    position: 'absolute',
+                    left: '50%',
+                    top: '50%',
+                    transform: 'translateX(-50%) translateY(-50%)',
+                  }" /> -->
         </div>
         <div class="arco-upload-picture-card" style="background-color: #9D9B9B;" v-else>
           <div class="arco-upload-picture-card-text">
@@ -85,7 +85,7 @@ defineExpose({
           </div>
         </div>
       </div>
-      <a-button v-else type="primary" size="large" shape="round">
+      <a-button v-else type="dashed" size="large" shape="round">
         <icon-image v-if="sort == '1'" :size="16" />
         <icon-live-broadcast v-else-if="sort == '2'" :size="16" />
         <icon-music v-else-if="sort == '3'" :size="16" />
