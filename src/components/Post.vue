@@ -1,6 +1,6 @@
 <script setup>
 import { ref, reactive, toRaw } from 'vue'
-import { useSigner } from 'vagmi'
+import { useSigner, useAccount } from 'vagmi'
 import { Message } from '@arco-design/web-vue'
 import Medias from '@/contants/media'
 import Category from '@/contants/category'
@@ -9,6 +9,7 @@ import { geneTrustBridgeContract } from '@/contracts'
 import { notiWaiting, notiError } from '@/utils/common'
 
 const { data } = useSigner()
+const { isConnected } = useAccount()
 const formRef = ref(null)
 const coverRef = ref(null)
 const mediaRef = ref(null)
@@ -51,13 +52,21 @@ const Post = reactive({
   },
   handleMediaUpload(res) {
     Post.form.media = res.cid
+  },
+  handleClick() {
+    if (!isConnected.value) {
+      Message.info('Please connect your wallet.')
+      return
+    }
+
+    Post.visible = true
   }
 })
 </script>
 
 <template>
   <div>
-    <div @click="Post.visible = true">
+    <div @click="Post.handleClick">
       <slot />
     </div>
 
@@ -72,10 +81,13 @@ const Post = reactive({
           </a-select>
         </a-form-item>
         <a-form-item field="desc" label="Description" required>
-          <a-textarea v-model="Post.form.desc" placeholder="Please enter description..." rows="4" />
+          <a-textarea v-model="Post.form.desc" placeholder="Please enter description..." :auto-size="{
+            minRows: 2,
+            maxRows: 5
+          }" />
         </a-form-item>
         <a-form-item field="cover" label="Cover">
-          <Upload ref="coverRef" @onSuccess="Post.handleCoverUpload" />
+          <Upload ref="coverRef" :ifCover="true" @onSuccess="Post.handleCoverUpload" />
         </a-form-item>
         <a-form-item field="mediaCate" label="Media">
           <a-radio-group v-model="Post.form.mediaCate">

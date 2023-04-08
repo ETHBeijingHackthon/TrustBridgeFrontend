@@ -20,8 +20,8 @@ defineProps({
 
 <template>
   <div class="show-card rounded cursor-pointer">
-    <div class="mb-3 rounded overflow-hidden" style="background: rgba(0, 0, 0, .1)">
-      <Cover class="h-[230px]" :coverUri="data.coverUri" :sort="data.sort" />
+    <div class="mb-3 rounded overflow-hidden h-[230px]" style="background: rgba(0, 0, 0, .1)">
+      <Cover :coverUri="data.coverUri" :sort="data.sort" />
     </div>
     <div class="px-5 pt-2 pb-4">
       <Category class="mb-1" :category="data.sort" />

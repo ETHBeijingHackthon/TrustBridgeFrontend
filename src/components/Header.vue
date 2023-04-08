@@ -21,7 +21,7 @@ const toHome = () => {
       <span class="ml-5">TrustBridge</span>
     </div>
     <Post class="ml-auto mr-4">
-      <a-button size="large" :disabled="!isConnected">
+      <a-button size="large" v-if="isConnected">
         <template #icon>
           <icon-send :size="20" />
         </template>

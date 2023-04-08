@@ -1,16 +1,17 @@
 <script setup>
-import { ref, toRaw, reactive, onMounted } from 'vue'
+import { ref, toRaw, reactive, onMounted, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { useSigner, useAccount } from 'vagmi'
 import { Message } from '@arco-design/web-vue'
 import { geneTrustBridgeContract } from '@/contracts'
 import Medias from '@/contants/media'
-import { Category, Upload, CommentCard, Cover } from '@/components'
+import { Category, Upload, CommentCard, DefaultCover } from '@/components'
 import { getAvatar, getCoverUri, formatAddress, notiWaiting, notiError } from '@/utils/common'
 import { queryTrustBridge, getNftreviewedEntities } from '@/apis'
 
 const formRef = ref(null)
 const mediaRef = ref(null)
+const videoRef = ref(null)
 const { query: { id } } = useRoute()
 const { data } = useSigner()
 const { address, isConnected } = useAccount()
@@ -19,6 +20,8 @@ const Detail = reactive({
   disabledForm: false,
   disabledCollect: false,
   ifCollected: false,
+  visiblePlayer: false,
+  mediaSrc: '',
   data: {
     coverUri: '',
     sort: 1,
@@ -113,6 +116,13 @@ const Detail = reactive({
         notiError(err.reason || err.message);
         Detail.disabledCollect = false
       })
+  },
+  async handleOpenPlay() {
+    Detail.visiblePlayer = true
+    Detail.mediaSrc = getCoverUri(Detail.data.multimedia)
+    await nextTick()
+    videoRef.value.load()
+    videoRef.value.play()
   }
 })
 
@@ -129,14 +139,26 @@ onMounted(() => {
 <template>
   <div class="detail flex justify-center pt-16">
     <div class="detail__left w-[380px] mr-20 text-center">
-      <div class="detail__left__image mb-7 rounded">
-        <Cover class="h-[368px]" :coverUri="Detail.data.coverUri" :sort="Detail.data.sort" />
+      <div class="detail__left__image mb-7 rounded h-[368px] relative">
+        <a-image v-if="getCoverUri(Detail.data.coverUri)" :src="getCoverUri(Detail.data.coverUri)" width="368"
+          height="356" fit="cover" />
+        <DefaultCover class="h-full" :sort="Detail.data.sort" v-else />
+        <!-- media -->
+        <div v-if="['3', '5'].indexOf(Detail.data.sort) > -1 && getCoverUri(Detail.data.multimedia)"
+          class="play absolute top-0 bottom-0 left-0 right-0 bg-black/70 z-10 flex items-center justify-center">
+          <icon-play-circle-fill :size="68" class="cursor-pointer" @click="Detail.handleOpenPlay" />
+        </div>
       </div>
       <Category :category="Detail.data.sort" class="justify-center mb-2" :showLable="true" />
       <div class="mb-4 text-4xl break-words">{{ Detail.data.title }}</div>
       <div class="mb-6 text-[#B9B9B9]">Posted by {{ formatAddress(Detail.data.owner) }}</div>
-      <div class="mb-2 text-3xl">{{ +Detail.data.score && (+Detail.data.score / 2).toFixed(1) }}</div>
-      <a-rate :model-value="Detail.data.score / 2" disabled allow-half />
+      <div class="mb-2 text-xl flex justify-center items-center"><a-rate :model-value="Detail.data.score / 2" disabled
+          allow-half />
+        <span class="ml-2">{{
+          +Detail.data.score
+          && (+Detail.data.score / 2).toFixed(1) }}</span>
+      </div>
+
       <div class="mt-4 mb-6 text-[#B9B9B9]">
         <a-avatar-group :size="24" :max-count="3">
           <a-avatar v-for="(item, index) in (Detail.data.reviewCount < 3 ? Detail.data.reviewCount : 3)" :key="index">
@@ -155,7 +177,7 @@ onMounted(() => {
     </div>
     <div class="detail__right w-[600px]">
       <div class="detail__right__title">Description</div>
-      <div class="detail__right__wrap mb-10">{{ Detail.data.description }}</div>
+      <div class="detail__right__wrap mb-10 text-base">{{ Detail.data.description }}</div>
       <div class="detail__right__title">Comment</div>
       <div class="detail__right__wrap mb-10">
         <a-form ref="formRef" :model="Detail.form" :disabled="Detail.disabledForm || !isConnected"
@@ -164,7 +186,10 @@ onMounted(() => {
             <a-rate v-model="Detail.form.point" :count="5" allow-half />
           </a-form-item>
           <a-form-item field="comments" label="Comments">
-            <a-textarea v-model="Detail.form.comments" placeholder="Please enter your comments" allow-clear />
+            <a-textarea v-model="Detail.form.comments" placeholder="Please enter your comments" :auto-size="{
+              minRows: 2,
+              maxRows: 5
+            }" allow-clear />
           </a-form-item>
           <a-form-item field="mediaType" label="Media">
             <a-radio-group v-model="Detail.form.mediaType">
@@ -190,6 +215,11 @@ onMounted(() => {
       </div>
     </div>
   </div>
+  <a-modal title="Player" v-model:visible="Detail.visiblePlayer" :width="520" :footer="false" simple>
+    <video ref="videoRef" controls="controls" autoplay="autoplay" class="w-full object-contain">
+      <source :src="Detail.mediaSrc" type="video/mp4" />
+    </video>
+  </a-modal>
 </template>
 
 <style lang="less" scoped>
@@ -210,7 +240,7 @@ onMounted(() => {
     &__wrap {
       border: 1px solid #525252;
       color: #B9B9B9;
-      @apply rounded p-4 px-5 text-justify;
+      @apply rounded p-5 px-7 text-justify;
     }
 
     :deep(.arco-radio-label) {

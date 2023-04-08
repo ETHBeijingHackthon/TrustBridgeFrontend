@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  /* font-family: Roboto, Inter, system-ui, Avenir, Helvetica, Arial, sans-serif; */
   line-height: 1.5;
   font-weight: 400;
 
@@ -33,9 +33,10 @@
   background-image: url(./assets/images/icon/food.png);
 }
 
-/* @media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-} */
+.icon-ethbeijing {
+  background-image: url(./assets/images/ethbeijing.png);
+}
+
+body {
+  font-family: 'Roboto', Inter, system-ui, Avenir, Helvetica, Arial, sans-serif !important;
+}

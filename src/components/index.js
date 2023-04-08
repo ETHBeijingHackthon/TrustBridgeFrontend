@@ -6,6 +6,7 @@ import CommentCard from './CommentCard.vue'
 import Post from './Post.vue'
 import ConnectWallet from './ConnectWallet.vue'
 import Cover from './Cover.vue'
+import DefaultCover from './DefaultCover.vue'
 
 export {
   Upload,
@@ -16,4 +17,5 @@ export {
   Post,
   ConnectWallet,
   Cover,
+  DefaultCover,
 }

@@ -20,11 +20,12 @@ const Home = reactive({
     let query = ''
 
     switch (Home.category) {
-      case '1': case '2': case '3': case '4': case '5': case '6':
-        query = `where: {fid: 0${Home.category == '1' ? '' : `, sort: "${Home.category}"`}}, first: ${pageSize}, skip: ${Home.skip}`
-        break
       case 'posted':
         query = `where: {fid: 0, owner: "${address.value}"}, first: ${pageSize}, skip: ${Home.skip}`
+        break
+
+      default:
+        query = `where: {fid: 0${Home.category == '1' ? '' : `, sort: "${Home.category}"`}}, first: ${pageSize}, skip: ${Home.skip}`
         break
     }
 
@@ -109,9 +110,11 @@ onMounted(() => {
 <template>
   <div class="home">
     <div class="home__top">
-      <h1 class="text-[48px] font-bold">Build and discover trust.</h1>
+      <h1 class="text-[48px] font-bold mb-0">Transparent, Trustworthy, Decentralized</h1>
+      <h2 class="text-[36px] font-bold mb-20"> For anyone to share and discover high-quality content</h2>
       <Post>
-        <a-button :disabled="!isConnected" size="large" type="primary">Post New Item</a-button>
+        <!-- <a-button :disabled="!isConnected" size="large" type="primary">Post New Item</a-button> -->
+        <div class="home__post" data-title="Post New Item"></div>
       </Post>
     </div>
     <div class="home__bottom">
@@ -119,15 +122,15 @@ onMounted(() => {
         <a-tab-pane v-for="item in Category" :key="item.key" :title="item.label">
         </a-tab-pane>
         <template #extra>
-          <a-button :disabled="!isConnected" class="ml-auto mr-4"
+          <a-button v-if="isConnected" :disabled="!isConnected" class="ml-auto mr-4"
             :class="{ 'btn-tab-selected': Home.category === 'posted' }" size="large" @click="Home.getPosted">
             <template #icon>
               <icon-send :size="20" />
             </template>
             Posted
           </a-button>
-          <a-button :class="{ 'btn-tab-selected': Home.category === 'collected' }" :disabled="!isConnected" size="large"
-            @click="Home.getCollected">
+          <a-button v-if="isConnected" :class="{ 'btn-tab-selected': Home.category === 'collected' }"
+            :disabled="!isConnected" size="large" @click="Home.getCollected">
             <template #icon>
               <icon-star />
             </template>
@@ -136,13 +139,16 @@ onMounted(() => {
         </template>
       </a-tabs>
       <a-spin :loading="Home.loading" tip="Loading..." class="w-full">
-        <ul class="flex flex-wrap mt-7 min-h-[400px]">
+        <ul v-if="Home.list.length" class="flex flex-wrap mt-7 min-h-[400px]">
           <li class="home__bottom__card" v-for="item in Home.list" :key="item.id">
             <ShowCard :data="item" @click="Home.handleToDetail(item.id)" />
           </li>
         </ul>
+        <div class="flex items-center justify-center mt-7 min-h-[200px]" v-else>
+          <a-empty />
+        </div>
       </a-spin>
-      <div class="text-center mt-8">
+      <div v-if="Home.list.length" class="text-center mt-8">
         <a-button-group>
           <a-button :disabled="!Home.skip" type="primary" @click="Home.handlePrev">
             <icon-left />
@@ -163,7 +169,52 @@ onMounted(() => {
   &__top {
     min-height: 500px;
     height: calc(100vh - 154px);
-    @apply pt-48 text-center;
+    @apply pt-40 text-center;
+  }
+
+  &__post {
+    position: relative;
+    display: inline-block;
+    padding: .8em 2em;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background: linear-gradient(135deg, #6e8efb, #a777e3);
+      border-radius: 4px;
+      transition: box-shadow .25s, transform .2s ease;
+      will-change: transform;
+      // box-shadow: 0 2px 5px rgba(0, 0, 0, .2);
+      // transform:
+      //   translateY(var(--ty, 0)) rotateX(var(--rx, 0)) rotateY(var(--ry, 0)) translateZ(var(--tz, -12px));
+    }
+
+    &:hover::before {
+      box-shadow: 0 0px 12px rgba(167, 119, 227, .5);
+    }
+
+    &::after {
+      position: relative;
+      display: inline-block;
+      content: attr(data-title);
+      transition: transform .2s ease;
+      font-weight: bold;
+      letter-spacing: .01em;
+      will-change: transform;
+      transform:
+        translateY(var(--ty, 0)) rotateX(var(--rx, 0)) rotateY(var(--ry, 0));
+    }
   }
 
   &__bottom {
@@ -186,7 +237,7 @@ onMounted(() => {
     }
 
     :deep(.arco-tabs-nav-size-large.arco-tabs-nav-type-line .arco-tabs-tab) {
-      @apply w-24 text-2xl font-bold text-center;
+      @apply mx-6 text-2xl font-bold text-center;
     }
 
     :deep(.arco-tabs-nav-type-line .arco-tabs-tab-title) {

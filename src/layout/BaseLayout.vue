@@ -15,7 +15,7 @@ const email = 'stoneprotocol@gmail.com'
     </a-layout-content>
     <a-layout-footer class="text-center pt-24 pb-14 bg-black">
       <div class="mb-10 text-xl font-bold">
-        Join the WeChat group and bulid with us
+        Join our WeChat Group & Building with us
       </div>
       <a-image width="174" :src="QrCode" class="mb-6" />
       <div class="text-[#999] mb-2">Mail: <a :href="`mailto:${email}`">{{ email }}</a></div>

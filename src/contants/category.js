@@ -5,6 +5,11 @@ export default [
     className: '',
   },
   {
+    key: '7',
+    label: 'ETH Beijing',
+    className: '',
+  },
+  {
     key: '2',
     label: 'Game',
     className: 'icon-game',
