@@ -1,6 +1,8 @@
 <script setup>
 import { reactive } from 'vue'
+import { Message, Notification } from '@arco-design/web-vue'
 import { useAccount, useConnect, useDisconnect, useNetwork, useSwitchNetwork } from 'vagmi'
+import { useClipboard } from '@vueuse/core'
 import Wallet from '@/assets/images/icon/wallet.svg'
 import Metamask from '@/assets/images/icon/metamask.svg'
 import WalletConnect from '@/assets/images/icon/wallet-connect.svg'
@@ -11,11 +13,7 @@ const mapConnector = {
   walletConnect: WalletConnect
 }
 
-const ConnectWallet = reactive({
-  visible: false,
-  disConcVisible: false
-})
-
+const { copy, isSupported } = useClipboard()
 const { chain } = useNetwork();
 const { switchNetwork }
   = useSwitchNetwork({
@@ -31,6 +29,28 @@ const { connect, connectors, pendingConnector } = useConnect({
     // switch network
     if (chain.value !== import.meta.env.VITE_CHAIN_ID_DECIMAL) {
       switchNetwork.value(import.meta.env.VITE_CHAIN_ID)
+    }
+  }
+})
+
+const ConnectWallet = reactive({
+  visible: false,
+  disConcVisible: false,
+  handleCopyAddress() {
+    if (isSupported.value) {
+      if (address.value) {
+        copy(address.value)
+          .then(() => {
+            Message.success('Copied!')
+          })
+          .catch(() => {
+            Notification.error('Copy failed!')
+          })
+      } else {
+        Notification.error('Please connect wallet.')
+      }
+    } else {
+      Notification.error('Your browser does not support Clipboard API')
     }
   }
 })
@@ -57,7 +77,8 @@ const handleDisconnect = () => {
         <a-avatar>
           <img :src="getAvatar(address)" :size="16" alt="avatar">
         </a-avatar>
-        <div class="ml-4">{{ formatAddress(address) }}</div>
+        <div class="ml-2 mr-1">{{ formatAddress(address) }}</div>
+        <icon-copy @click="ConnectWallet.handleCopyAddress" />
       </div>
       <a-button @click="handleDisconnect" long>Disconnect</a-button>
     </template>
