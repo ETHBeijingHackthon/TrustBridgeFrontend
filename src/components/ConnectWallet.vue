@@ -20,8 +20,7 @@ const { chain } = useNetwork();
 const { switchNetwork }
   = useSwitchNetwork({
     onError(error) {
-      notiError(error)
-      console.log('Error', error);
+      notiError(error.internal.message)
     }
   });
 const { disconnect } = useDisconnect()

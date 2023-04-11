@@ -1,6 +1,7 @@
 <script setup>
 import { ref, nextTick } from 'vue'
 import { getAvatar, formatAddress, getCoverUri } from '@/utils/common'
+import { isMobile } from '@/utils/common';
 
 const props = defineProps({
   data: {
@@ -45,14 +46,15 @@ const handleCloseModal = () => {
     </div>
     <div class="mb-2">{{ data.description }}</div>
     <div v-if="getCoverUri(data.multimedia)">
-      <a-image v-if="data.mediaType == 'image'" width="200" height="200" fit="cover"
-        :src="getCoverUri(data.multimedia)" />
+      <a-image v-if="data.mediaType == 'image'" :height="isMobile() ? '120px' : '200px'"
+        :width="isMobile() ? '100%' : '300px'" fit="cover" :src="getCoverUri(data.multimedia)" />
       <a-button shape="round" @click="handlePlay" v-else-if="data.mediaType == 'video'">
         <icon-play-arrow-fill /> <span class="ml-1">Play</span>
       </a-button>
     </div>
   </div>
-  <a-modal title="Player" v-model:visible="visiblePlayer" @close="handleCloseModal" :width="520" :footer="false" simple>
+  <a-modal title="Player" v-model:visible="visiblePlayer" @close="handleCloseModal" :width="isMobile() ? '90%' : 520"
+    :footer="false" simple>
     <video ref="videoRef" controls="controls" autoplay="autoplay" class="w-full object-contain">
       <source :src="mediaSrc" type="video/mp4" />
     </video>

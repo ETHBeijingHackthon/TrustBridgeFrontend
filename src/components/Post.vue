@@ -6,7 +6,7 @@ import Medias from '@/contants/media'
 import Category from '@/contants/category'
 import { Upload } from '@/components'
 import { geneTrustBridgeContract } from '@/contracts'
-import { notiWaiting, notiError } from '@/utils/common'
+import { notiWaiting, notiError, isMobile } from '@/utils/common'
 
 const { data } = useSigner()
 const { isConnected } = useAccount()
@@ -23,7 +23,7 @@ const Post = reactive({
     category: '',
     desc: '',
     cover: '',
-    mediaCate: '1',
+    mediaCate: Medias[0].key,
     media: ''
   },
   handleSubmit({ values, errors }) {
@@ -84,7 +84,8 @@ const Post = reactive({
       <slot />
     </div>
 
-    <a-modal v-model:visible="Post.visible" :footer="false" title="Post a new item" @close="Post.handleCloseModal">
+    <a-modal v-model:visible="Post.visible" :footer="false" :width="isMobile() ? '90%' : 540" title="Post a new item"
+      @close="Post.handleCloseModal">
       <a-form :model="Post.form" :disabled="Post.disabled" ref="formRef" layout="vertical" @submit="Post.handleSubmit">
         <a-form-item field="title" label="Title" required>
           <a-input v-model="Post.form.title" placeholder="please enter title..." />

@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router'
 import Category from '@/contants/category'
 import { ShowCard, Post } from '@/components'
 import { getNftcreatedEntities, getNftcollectedEntities, queryTrustBridge } from '@/apis'
+import { isMobile } from '@/utils/common'
 
 const pageSize = 10
 const { address, isConnected } = useAccount()
@@ -45,10 +46,6 @@ const Home = reactive({
     Home.getCreatedNft()
   },
   getCollected() {
-    Home.category = 'collected'
-    Home.skip = 0
-    // Home.loading = true
-    // Home.list = []
     getNftcollectedEntities(`first: ${pageSize}, skip: ${Home.skip}, where: {collector: "${address.value}"}`)
       .then(res => {
         const ids = res.nftcollectedEntities.map(item => item.nftId)
@@ -63,6 +60,13 @@ const Home = reactive({
       .catch(() => {
         Home.loading = false
       })
+  },
+  getCollectedData() {
+    Home.category = 'collected'
+    Home.skip = 0
+    Home.loading = true
+    Home.list = []
+    Home.getCollected()
   },
   getData() {
     if (Home.category != 'collected') {
@@ -102,6 +106,7 @@ const Home = reactive({
 let si;
 
 onMounted(() => {
+  Home.loading = true
   Home.getData()
   si = setInterval(() => {
     Home.getData()
@@ -115,37 +120,39 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="home">
-    <div class="home__top">
-      <h1 class="text-[48px] font-bold mb-0">Transparent, Trustworthy, Decentralized</h1>
-      <h2 class="text-[36px] font-bold mb-20"> For anyone to share and discover high-quality content</h2>
+    <div class="home__top pt-16 xl:pt-36 2xl:pt-44">
+      <h1 class="text-[28px] lg:text-[48px] font-bold mb-4 lg:mb-0">Transparent, Trustworthy, Decentralized</h1>
+      <h2 class="text-[20px] lg:text-[36px] font-bold mb-20"> For anyone to share and discover high-quality content</h2>
       <Post>
-        <!-- <a-button :disabled="!isConnected" size="large" type="primary">Post New Item</a-button> -->
-        <div class="home__post" data-title="Post New Item"></div>
+        <div class="home__post text-base lg:text-xl" data-title="Post New Item"></div>
       </Post>
     </div>
     <div class="home__bottom">
-      <a-tabs :active-key="Home.category" size="large" @change="Home.handleTabChange">
+      <a-tabs :active-key="Home.category" :size="isMobile() ? 'small' : 'large'" @change="Home.handleTabChange">
         <a-tab-pane v-for="item in Category" :key="item.key" :title="item.label">
         </a-tab-pane>
         <template #extra>
-          <a-button v-if="isConnected" :disabled="!isConnected" class="ml-auto mr-4"
-            :class="{ 'btn-tab-selected': Home.category === 'posted' }" size="large" @click="Home.getPosted">
-            <template #icon>
-              <icon-send :size="20" />
-            </template>
-            Posted
-          </a-button>
-          <a-button v-if="isConnected" :class="{ 'btn-tab-selected': Home.category === 'collected' }"
-            :disabled="!isConnected" size="large" @click="Home.getCollected">
-            <template #icon>
-              <icon-star />
-            </template>
-            Collected
-          </a-button>
+          <div class="w-full mt-6 lg:mt-0 flex justify-center">
+            <a-button v-if="isConnected" :disabled="!isConnected" class="ml-0 lg:ml-auto mr-4"
+              :class="{ 'btn-tab-selected': Home.category === 'posted' }" :size="isMobile() ? 'medium' : 'large'"
+              @click="Home.getPosted">
+              <template #icon>
+                <icon-send :size="20" />
+              </template>
+              Posted
+            </a-button>
+            <a-button v-if="isConnected" :class="{ 'btn-tab-selected': Home.category === 'collected' }"
+              :disabled="!isConnected" :size="isMobile() ? 'medium' : 'large'" @click="Home.getCollectedData">
+              <template #icon>
+                <icon-star />
+              </template>
+              Collected
+            </a-button>
+          </div>
         </template>
       </a-tabs>
       <a-spin :loading="Home.loading" tip="Loading..." class="w-full">
-        <ul v-if="Home.list.length" class="flex flex-wrap mt-7 min-h-[400px]">
+        <ul v-if="Home.list.length" class="home__bottom__list mt-2 lg:mt-7 min-h-[200px]">
           <li class="home__bottom__card" v-for="item in Home.list" :key="item.id">
             <ShowCard :data="item" @click="Home.handleToDetail(item.id)" />
           </li>
@@ -154,7 +161,7 @@ onBeforeUnmount(() => {
           <a-empty />
         </div>
       </a-spin>
-      <div v-if="Home.list.length" class="text-center mt-8">
+      <div v-if="Home.list.length" class="text-center mt-2 lg:mt-8">
         <a-button-group>
           <a-button :disabled="!Home.skip" type="primary" @click="Home.handlePrev">
             <icon-left />
@@ -173,9 +180,7 @@ onBeforeUnmount(() => {
 <style lang="less" scoped>
 .home {
   &__top {
-    min-height: 500px;
-    height: calc(100vh - 154px);
-    @apply pt-40 text-center;
+    @apply text-center pb-16;
   }
 
   &__post {
@@ -187,7 +192,6 @@ onBeforeUnmount(() => {
     cursor: pointer;
     user-select: none;
     color: white;
-    font-size: 20px;
     font-weight: bold;
 
     &::before {
@@ -201,9 +205,6 @@ onBeforeUnmount(() => {
       border-radius: 4px;
       transition: box-shadow .25s, transform .2s ease;
       will-change: transform;
-      // box-shadow: 0 2px 5px rgba(0, 0, 0, .2);
-      // transform:
-      //   translateY(var(--ty, 0)) rotateX(var(--rx, 0)) rotateY(var(--ry, 0)) translateZ(var(--tz, -12px));
     }
 
     &:hover::before {
@@ -250,17 +251,72 @@ onBeforeUnmount(() => {
       @apply mx-auto;
     }
 
-    &__card {
-      width: calc((100% - 80px) / 5);
-      @apply mr-5 mb-11;
+    :deep(.arco-tabs-nav) {
+      @apply flex-wrap;
+    }
 
-      &:nth-of-type(5n) {
-        margin-right: 0;
-      }
+    :deep(.arco-tabs-nav-extra) {
+      @apply w-full;
+    }
+
+    &__list {
+      @apply flex flex-wrap;
+    }
+
+    &__card {
+      width: 100%;
+      @apply mr-0 mb-4;
     }
 
     .btn-tab-selected {
       border-color: #fff;
+    }
+  }
+}
+
+@media screen and (min-width: 640px) {
+  .home {
+    &__bottom {
+      :deep(.arco-tabs-nav-extra) {
+        @apply w-auto;
+      }
+
+      &__card {
+        width: calc((100% - 40px) / 3);
+        @apply mr-5 mb-5;
+
+        &:nth-of-type(3n) {
+          margin-right: 0;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .home {
+    &__top {
+      height: calc(100vh - 154px);
+    }
+
+    &__bottom {
+
+      :deep(.arco-tabs-nav-extra) {
+        @apply w-auto;
+      }
+
+      &__card {
+        width: calc((100% - 80px) / 5);
+        @apply mr-5 mb-11;
+
+        &:nth-of-type(3n) {
+          @apply mr-5;
+        }
+
+        &:nth-of-type(5n) {
+          margin-right: 0;
+        }
+      }
     }
   }
 }

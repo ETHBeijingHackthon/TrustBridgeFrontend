@@ -20,13 +20,13 @@ defineProps({
 
 <template>
   <div class="show-card rounded cursor-pointer">
-    <div class="mb-3 rounded overflow-hidden h-[230px]" style="background: rgba(0, 0, 0, .1)">
+    <div class="mb-1 lg:mb-3 rounded overflow-hidden h-[120px] lg:h-[230px]" style="background: rgba(0, 0, 0, .1)">
       <Cover :coverUri="data.coverUri" :sort="data.sort" />
     </div>
-    <div class="px-5 pt-2 pb-4">
+    <div class="px-4 lg:px-5 pt-2 pb-2 lg:pb-4">
       <Category class="mb-1" :category="data.sort" />
-      <div class="mb-2 break-words truncate">{{ data.title }}</div>
-      <div class="mb-2">
+      <div class="mb-1 lg:mb-2 break-words truncate">{{ data.title }}</div>
+      <div class="mb-1 lg:mb-2">
         <a-avatar-group :size="24" :max-count="3">
           <a-avatar v-for="(item, index) in +data.reviewCount < 3 ? +data.reviewCount : 3 " :key="index">
             <img :src="getAvatar(data.id + index)" />

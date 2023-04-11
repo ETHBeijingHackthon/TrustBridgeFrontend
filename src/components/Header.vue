@@ -13,12 +13,12 @@ const toHome = () => {
 </script>
 
 <template>
-  <div class="flex px-10 py-5 items-center border-b-[1px] border-b-[#4A4A4B]">
+  <div class="flex px-4 lg:px-10 py-5 items-center border-b-[1px] border-b-[#4A4A4B]">
     <div class="flex text-lg font-bold items-center cursor-pointer" @click="toHome">
-      <div class="bg-primary p-2 rounded">
+      <div class="bg-primary p-1 lg:p-2 rounded">
         <img :src="Logo" class="margin-0" alt="Logo" />
       </div>
-      <span class="ml-5">TrustBridge</span>
+      <span class="hidden lg:block ml-5">TrustBridge</span>
     </div>
     <Post class="ml-auto mr-4">
       <a-button size="large" v-if="isConnected">

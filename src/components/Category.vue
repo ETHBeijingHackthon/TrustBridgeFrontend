@@ -18,9 +18,7 @@ const currentCate = computed(() => Category.filter(item => item.key === props.ca
 
 <template>
   <div class="flex items-center">
-    <div class="w-6 h-6 mr-1 bg-center bg-contain bg-no-repeat" :class="[currentCate?.className]"></div>
-    <span v-if="showLable" class="text-lg">{{ currentCate?.label }}</span>
+    <div class="w-4 lg:w-6 h-4 lg:h-6 mr-1 bg-center bg-contain bg-no-repeat" :class="[currentCate?.className]"></div>
+    <span v-if="showLable" class="text-base lg:text-lg">{{ currentCate?.label }}</span>
   </div>
 </template>
-
-<style scoped></style>
