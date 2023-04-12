@@ -7,6 +7,7 @@ import Post from './Post.vue'
 import ConnectWallet from './ConnectWallet.vue'
 import Cover from './Cover.vue'
 import DefaultCover from './DefaultCover.vue'
+import VerifyNetwork from './VerifyNetwork.vue'
 
 export {
   Upload,
@@ -18,4 +19,5 @@ export {
   ConnectWallet,
   Cover,
   DefaultCover,
+  VerifyNetwork,
 }

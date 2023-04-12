@@ -5,7 +5,7 @@ import { useSigner, useAccount } from 'vagmi'
 import { Message } from '@arco-design/web-vue'
 import { geneTrustBridgeContract } from '@/contracts'
 import Medias from '@/contants/media'
-import { Category, Upload, CommentCard, DefaultCover } from '@/components'
+import { Category, Upload, CommentCard, DefaultCover, VerifyNetwork } from '@/components'
 import { getAvatar, getCoverUri, formatAddress, notiWaiting, notiError, isMobile } from '@/utils/common'
 import { queryTrustBridge, getNftreviewedEntities } from '@/apis'
 
@@ -251,8 +251,10 @@ onBeforeUnmount(() => {
               @onEnd="Detail.handleUploadEnd" @onSuccess="Detail.handleCoverUpload" />
           </a-form-item>
           <a-form-item>
-            <a-button :disabled="Detail.disabledSubmit" type="primary" size="large" html-type="submit"
-              long>Submit</a-button>
+            <VerifyNetwork>
+              <a-button :disabled="Detail.disabledSubmit" type="primary" size="large" html-type="submit"
+                long>Submit</a-button>
+            </VerifyNetwork>
           </a-form-item>
         </a-form>
       </div>

@@ -4,7 +4,7 @@ import { useSigner, useAccount, useNetwork, useSwitchNetwork } from 'vagmi'
 import { Message } from '@arco-design/web-vue'
 import Medias from '@/contants/media'
 import Category from '@/contants/category'
-import { Upload } from '@/components'
+import { Upload, VerifyNetwork } from '@/components'
 import { geneTrustBridgeContract } from '@/contracts'
 import { notiWaiting, notiError, isMobile } from '@/utils/common'
 
@@ -128,13 +128,10 @@ const Post = reactive({
             @onEnd="Post.handleUploadEnd" @onSuccess="Post.handleMediaUpload" />
         </a-form-item>
         <a-form-item>
-          <a-button v-if="chainTarget.idDecimal == chain?.id" :disabled="Post.disabledSubmit" type="primary" size="large"
-            html-type="submit" long>Create</a-button>
-          <a-button v-else type="outline" class="mx-auto" @click="switchNetwork(chainTarget.id)">
-            <template #icon>
-              <icon-bulb />
-            </template>
-            Switch your network to {{ chainTarget.name }} to start!</a-button>
+          <VerifyNetwork>
+            <a-button :disabled="Post.disabledSubmit" type="primary" size="large" html-type="submit"
+              long>Create</a-button>
+          </VerifyNetwork>
         </a-form-item>
       </a-form>
     </a-modal>
