@@ -18,11 +18,15 @@ const email = 'stoneprotocol@gmail.com'
         Join our WeChat Group & Building with us
       </div>
       <div class="flex lg:block items-center">
-        <a-image :src="QrCode" class="w-[60px] lg:w-[174px] mx-auto mb-0 lg:mb-6" />
+        <a-image :src="QrCode" class="w-[60px] lg:w-[154px] mx-auto mb-0 lg:mb-6" />
+
         <div>
-          <div class="text-[#999] mb-1 lg:mb-2">Mail: <a :href="`mailto:${email}`">{{ email }}</a></div>
           <div class="text-[#999]">COPYRIGHT <icon-copyright /> 2023 TrustBridge Built with ❤. love.</div>
         </div>
+      </div>
+      <div class="mt-4">
+        <a href="https://github.com/ETHBeijingHackthon" target="_blank"><icon-github :size="30" /></a>
+        <a :href="`mailto:${email}`" target="_blank" class="ml-2"><icon-google-circle-fill :size="30" /></a>
       </div>
     </a-layout-footer>
     <a-back-top />
