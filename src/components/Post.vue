@@ -1,6 +1,6 @@
 <script setup>
 import { ref, reactive, toRaw } from 'vue'
-import { useSigner, useAccount } from 'vagmi'
+import { useSigner, useAccount, useNetwork, useSwitchNetwork } from 'vagmi'
 import { Message } from '@arco-design/web-vue'
 import Medias from '@/contants/media'
 import Category from '@/contants/category'
@@ -10,9 +10,22 @@ import { notiWaiting, notiError, isMobile } from '@/utils/common'
 
 const { data } = useSigner()
 const { isConnected } = useAccount()
+const { chain } = useNetwork();
+const { switchNetwork }
+  = useSwitchNetwork({
+    onError(error) {
+      notiError(error.internal.message)
+    }
+  });
+
 const formRef = ref(null)
 const coverRef = ref(null)
 const mediaRef = ref(null)
+const chainTarget = {
+  id: import.meta.env.VITE_CHAIN_ID,
+  name: import.meta.env.VITE_CHAIN_NAME,
+  idDecimal: import.meta.env.VITE_CHAIN_ID_DECIMAL
+}
 
 const Post = reactive({
   visible: false,
@@ -115,7 +128,13 @@ const Post = reactive({
             @onEnd="Post.handleUploadEnd" @onSuccess="Post.handleMediaUpload" />
         </a-form-item>
         <a-form-item>
-          <a-button :disabled="Post.disabledSubmit" type="primary" size="large" html-type="submit" long>Create</a-button>
+          <a-button v-if="chainTarget.idDecimal == chain?.id" :disabled="Post.disabledSubmit" type="primary" size="large"
+            html-type="submit" long>Create</a-button>
+          <a-button v-else type="outline" class="mx-auto" @click="switchNetwork(chainTarget.id)">
+            <template #icon>
+              <icon-bulb />
+            </template>
+            Switch your network to {{ chainTarget.name }} to start!</a-button>
         </a-form-item>
       </a-form>
     </a-modal>

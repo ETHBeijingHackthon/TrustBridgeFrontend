@@ -1,12 +1,12 @@
 <script setup>
 import { reactive } from 'vue'
 import { Message, Notification } from '@arco-design/web-vue'
-import { useAccount, useConnect, useDisconnect, useNetwork, useSwitchNetwork } from 'vagmi'
+import { useAccount, useConnect, useDisconnect } from 'vagmi'
 import { useClipboard } from '@vueuse/core'
 import Wallet from '@/assets/images/icon/wallet.svg'
 import Metamask from '@/assets/images/icon/metamask.svg'
 import WalletConnect from '@/assets/images/icon/wallet-connect.svg'
-import { formatAddress, getAvatar, notiError } from '@/utils/common'
+import { formatAddress, getAvatar } from '@/utils/common'
 
 const mapConnector = {
   metaMask: Metamask,
@@ -14,22 +14,11 @@ const mapConnector = {
 }
 
 const { copy, isSupported } = useClipboard()
-const { chain } = useNetwork();
-const { switchNetwork }
-  = useSwitchNetwork({
-    onError(error) {
-      notiError(error.internal.message)
-    }
-  });
 const { disconnect } = useDisconnect()
 const { address, status } = useAccount()
 const { connect, connectors, pendingConnector } = useConnect({
   onConnect: () => {
     ConnectWallet.visible = false
-    // switch network
-    if (chain.value !== import.meta.env.VITE_CHAIN_ID_DECIMAL) {
-      switchNetwork.value(import.meta.env.VITE_CHAIN_ID)
-    }
   }
 })
 
